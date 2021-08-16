@@ -5,23 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
 <meta name="generator" content="Hexo 5.4.0">
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
 
-<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/blog/css/main.css">
 
 
-<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+<link rel="stylesheet" href="/blog/lib/font-awesome/css/font-awesome.min.css">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
 
 
 <script id="hexo-configurations">
   var NexT = window.NexT || {};
   var CONFIG = {
-    hostname: new URL('https://casecy.github.io').hostname,
-    root: '/',
+    hostname: new URL('https://casecy.github.io/blog').hostname,
+    root: '/blog/',
     scheme: 'Mist',
     version: '7.7.0',
     exturl: false,
@@ -50,7 +50,7 @@
   <meta name="description" content="了解认识dubbo和dubbox可以参考：Dubbo架构设计详解Dubbo详细介绍与安装使用过程Dubbo入门 dubbo服务管理中心用来管理，查询发布的服务，和dubbo本身的业务逻辑没有关系，是用来管理消费者和服务方的dubbo  下载安装dubbox到githug下载dubbox的源码，     在checkout出来的dubbox目录执行mvn install   -Dmaven.test">
 <meta property="og:type" content="article">
 <meta property="og:title" content=" 简单dubbox项目搭建和应用		">
-<meta property="og:url" content="https://casecy.github.io/2018/10/19/%E7%AE%80%E5%8D%95dubbox%E9%A1%B9%E7%9B%AE%E6%90%AD%E5%BB%BA%E5%92%8C%E5%BA%94%E7%94%A8/index.html">
+<meta property="og:url" content="https://casecy.github.io/blog/2018/10/19/%E7%AE%80%E5%8D%95dubbox%E9%A1%B9%E7%9B%AE%E6%90%AD%E5%BB%BA%E5%92%8C%E5%BA%94%E7%94%A8/index.html">
 <meta property="og:site_name" content="Me">
 <meta property="og:description" content="了解认识dubbo和dubbox可以参考：Dubbo架构设计详解Dubbo详细介绍与安装使用过程Dubbo入门 dubbo服务管理中心用来管理，查询发布的服务，和dubbo本身的业务逻辑没有关系，是用来管理消费者和服务方的dubbo  下载安装dubbox到githug下载dubbox的源码，     在checkout出来的dubbox目录执行mvn install   -Dmaven.test">
 <meta property="og:locale" content="zh_CN">
@@ -60,7 +60,7 @@
 <meta property="article:tag" content="杂">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="https://casecy.github.io/2018/10/19/%E7%AE%80%E5%8D%95dubbox%E9%A1%B9%E7%9B%AE%E6%90%AD%E5%BB%BA%E5%92%8C%E5%BA%94%E7%94%A8/">
+<link rel="canonical" href="https://casecy.github.io/blog/2018/10/19/%E7%AE%80%E5%8D%95dubbox%E9%A1%B9%E7%9B%AE%E6%90%AD%E5%BB%BA%E5%92%8C%E5%BA%94%E7%94%A8/">
 
 
 <script id="page-configurations">
@@ -114,7 +114,7 @@
   <div class="site-meta">
 
     <div>
-      <a href="/" class="brand" rel="start">
+      <a href="/blog/" class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
         <span class="site-title">Me</span>
         <span class="logo-line-after"><i></i></span>
@@ -137,22 +137,22 @@
   <ul id="menu" class="menu">
         <li class="menu-item menu-item-home">
 
-    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+    <a href="/blog/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
 
   </li>
         <li class="menu-item menu-item-tags">
 
-    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+    <a href="/blog/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
 
   </li>
         <li class="menu-item menu-item-categories">
 
-    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+    <a href="/blog/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
 
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+    <a href="/blog/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
 
   </li>
   </ul>
@@ -182,10 +182,10 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://casecy.github.io/2018/10/19/%E7%AE%80%E5%8D%95dubbox%E9%A1%B9%E7%9B%AE%E6%90%AD%E5%BB%BA%E5%92%8C%E5%BA%94%E7%94%A8/">
+    <link itemprop="mainEntityOfPage" href="https://casecy.github.io/blog/2018/10/19/%E7%AE%80%E5%8D%95dubbox%E9%A1%B9%E7%9B%AE%E6%90%AD%E5%BB%BA%E5%92%8C%E5%BA%94%E7%94%A8/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
       <meta itemprop="name" content="C.c">
       <meta itemprop="description" content="A Blog">
     </span>
@@ -220,7 +220,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%9D%82/" itemprop="url" rel="index">
+                  <a href="/blog/categories/%E6%9D%82/" itemprop="url" rel="index">
                     <span itemprop="name">杂</span>
                   </a>
                 </span>
@@ -279,7 +279,7 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/%E6%9D%82/" rel="tag"># 杂</a>
+              <a href="/blog/tags/%E6%9D%82/" rel="tag"># 杂</a>
           </div>
 
         
@@ -288,11 +288,11 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2018/10/19/docker%E4%BD%BF%E7%94%A8/" rel="prev" title=" docker使用		">
+    <a href="/blog/2018/10/19/docker%E4%BD%BF%E7%94%A8/" rel="prev" title=" docker使用		">
       <i class="fa fa-chevron-left"></i>  docker使用		
     </a></div>
       <div class="post-nav-item">
-    <a href="/2018/10/19/%E4%BD%BF%E7%94%A8poi%E7%94%9F%E6%88%90%E5%92%8C%E5%AF%BC%E5%85%A5excel/" rel="next" title=" 使用poi生成和导入Excel		">
+    <a href="/blog/2018/10/19/%E4%BD%BF%E7%94%A8poi%E7%94%9F%E6%88%90%E5%92%8C%E5%AF%BC%E5%85%A5excel/" rel="next" title=" 使用poi生成和导入Excel		">
        使用poi生成和导入Excel		 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
@@ -366,20 +366,20 @@
 <div class="site-state-wrap motion-element">
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
-          <a href="/archives/">
+          <a href="/blog/archives/">
         
           <span class="site-state-item-count">52</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
-            <a href="/categories/">
+            <a href="/blog/categories/">
           
         <span class="site-state-item-count">17</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
-            <a href="/tags/">
+            <a href="/blog/tags/">
           
         <span class="site-state-item-count">20</span>
         <span class="site-state-item-name">标签</span></a>
@@ -440,21 +440,21 @@
   </div>
 
   
-  <script src="/lib/anime.min.js"></script>
+  <script src="/blog/lib/anime.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
   <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
-  <script src="/lib/velocity/velocity.min.js"></script>
-  <script src="/lib/velocity/velocity.ui.min.js"></script>
+  <script src="/blog/lib/velocity/velocity.min.js"></script>
+  <script src="/blog/lib/velocity/velocity.ui.min.js"></script>
 
-<script src="/js/utils.js"></script>
+<script src="/blog/js/utils.js"></script>
 
-<script src="/js/motion.js"></script>
-
-
-<script src="/js/schemes/muse.js"></script>
+<script src="/blog/js/motion.js"></script>
 
 
-<script src="/js/next-boot.js"></script>
+<script src="/blog/js/schemes/muse.js"></script>
+
+
+<script src="/blog/js/next-boot.js"></script>
 
 
 

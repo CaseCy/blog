@@ -5,23 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
 <meta name="generator" content="Hexo 5.4.0">
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
 
-<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/blog/css/main.css">
 
 
-<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+<link rel="stylesheet" href="/blog/lib/font-awesome/css/font-awesome.min.css">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
 
 
 <script id="hexo-configurations">
   var NexT = window.NexT || {};
   var CONFIG = {
-    hostname: new URL('https://casecy.github.io').hostname,
-    root: '/',
+    hostname: new URL('https://casecy.github.io/blog').hostname,
+    root: '/blog/',
     scheme: 'Mist',
     version: '7.7.0',
     exturl: false,
@@ -50,7 +50,7 @@
   <meta name="description" content="参考： Mysql存储过程 DECLARE … HANDLER 存储过程的创建1CREATE PROCEDURE 存储过程名()   存储过程的删除12-- 删除存储过程后面不需要跟(),只给出存储过程名DROP PROCEDURE productpricing;        删除时先判断是否存在1DROP PROCEDURE IF EXISTS productpricing   Mysql命令">
 <meta property="og:type" content="article">
 <meta property="og:title" content=" mysql存储过程		">
-<meta property="og:url" content="https://casecy.github.io/2019/08/23/mysql%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B/index.html">
+<meta property="og:url" content="https://casecy.github.io/blog/2019/08/23/mysql%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B/index.html">
 <meta property="og:site_name" content="Me">
 <meta property="og:description" content="参考： Mysql存储过程 DECLARE … HANDLER 存储过程的创建1CREATE PROCEDURE 存储过程名()   存储过程的删除12-- 删除存储过程后面不需要跟(),只给出存储过程名DROP PROCEDURE productpricing;        删除时先判断是否存在1DROP PROCEDURE IF EXISTS productpricing   Mysql命令">
 <meta property="og:locale" content="zh_CN">
@@ -60,7 +60,7 @@
 <meta property="article:tag" content="mysql">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="https://casecy.github.io/2019/08/23/mysql%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B/">
+<link rel="canonical" href="https://casecy.github.io/blog/2019/08/23/mysql%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B/">
 
 
 <script id="page-configurations">
@@ -114,7 +114,7 @@
   <div class="site-meta">
 
     <div>
-      <a href="/" class="brand" rel="start">
+      <a href="/blog/" class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
         <span class="site-title">Me</span>
         <span class="logo-line-after"><i></i></span>
@@ -137,22 +137,22 @@
   <ul id="menu" class="menu">
         <li class="menu-item menu-item-home">
 
-    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+    <a href="/blog/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
 
   </li>
         <li class="menu-item menu-item-tags">
 
-    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+    <a href="/blog/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
 
   </li>
         <li class="menu-item menu-item-categories">
 
-    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+    <a href="/blog/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
 
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+    <a href="/blog/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
 
   </li>
   </ul>
@@ -182,10 +182,10 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://casecy.github.io/2019/08/23/mysql%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B/">
+    <link itemprop="mainEntityOfPage" href="https://casecy.github.io/blog/2019/08/23/mysql%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
       <meta itemprop="name" content="C.c">
       <meta itemprop="description" content="A Blog">
     </span>
@@ -220,7 +220,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/mysql/" itemprop="url" rel="index">
+                  <a href="/blog/categories/mysql/" itemprop="url" rel="index">
                     <span itemprop="name">mysql</span>
                   </a>
                 </span>
@@ -318,7 +318,7 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/mysql/" rel="tag"># mysql</a>
+              <a href="/blog/tags/mysql/" rel="tag"># mysql</a>
           </div>
 
         
@@ -327,11 +327,11 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2019/04/09/lets-encrypt%E6%B3%9B%E5%9F%9F%E5%90%8Dssl%E8%AF%81%E4%B9%A6%E9%85%8D%E7%BD%AE/" rel="prev" title=" Let's Encrypt泛域名SSL证书配置		">
+    <a href="/blog/2019/04/09/lets-encrypt%E6%B3%9B%E5%9F%9F%E5%90%8Dssl%E8%AF%81%E4%B9%A6%E9%85%8D%E7%BD%AE/" rel="prev" title=" Let's Encrypt泛域名SSL证书配置		">
       <i class="fa fa-chevron-left"></i>  Let's Encrypt泛域名SSL证书配置		
     </a></div>
       <div class="post-nav-item">
-    <a href="/2019/09/12/%E4%BD%BF%E7%94%A8docker%E6%90%AD%E5%BB%BAredis%E9%9B%86%E7%BE%A4/" rel="next" title=" 使用docker搭建redis集群		">
+    <a href="/blog/2019/09/12/%E4%BD%BF%E7%94%A8docker%E6%90%AD%E5%BB%BAredis%E9%9B%86%E7%BE%A4/" rel="next" title=" 使用docker搭建redis集群		">
        使用docker搭建redis集群		 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
@@ -405,20 +405,20 @@
 <div class="site-state-wrap motion-element">
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
-          <a href="/archives/">
+          <a href="/blog/archives/">
         
           <span class="site-state-item-count">52</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
-            <a href="/categories/">
+            <a href="/blog/categories/">
           
         <span class="site-state-item-count">17</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
-            <a href="/tags/">
+            <a href="/blog/tags/">
           
         <span class="site-state-item-count">20</span>
         <span class="site-state-item-name">标签</span></a>
@@ -479,21 +479,21 @@
   </div>
 
   
-  <script src="/lib/anime.min.js"></script>
+  <script src="/blog/lib/anime.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
   <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
-  <script src="/lib/velocity/velocity.min.js"></script>
-  <script src="/lib/velocity/velocity.ui.min.js"></script>
+  <script src="/blog/lib/velocity/velocity.min.js"></script>
+  <script src="/blog/lib/velocity/velocity.ui.min.js"></script>
 
-<script src="/js/utils.js"></script>
+<script src="/blog/js/utils.js"></script>
 
-<script src="/js/motion.js"></script>
-
-
-<script src="/js/schemes/muse.js"></script>
+<script src="/blog/js/motion.js"></script>
 
 
-<script src="/js/next-boot.js"></script>
+<script src="/blog/js/schemes/muse.js"></script>
+
+
+<script src="/blog/js/next-boot.js"></script>
 
 
 
