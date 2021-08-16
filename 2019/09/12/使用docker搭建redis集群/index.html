@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://cononyc.gitee.io').hostname,
+    root: '/',
+    scheme: 'Mist',
+    version: '7.7.0',
+    exturl: false,
+    sidebar: {"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":false,"style":"flat"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="参考： docker redis4.0 集群（cluster）搭建 创建redis容器1.创建配置文件要搭建集群的文件夹下创建redis-cluster.tmpl，内容为以下内容，根据需要更改我这里文件在&#x2F;root&#x2F;redis-cluster(后面会用到这个路径)下 port $&amp;#123;PORT&amp;#125; protected-mode no cluster-enabled yes clust">
+<meta property="og:type" content="article">
+<meta property="og:title" content=" 使用docker搭建redis集群		">
+<meta property="og:url" content="https://cononyc.gitee.io/2019/09/12/%E4%BD%BF%E7%94%A8docker%E6%90%AD%E5%BB%BAredis%E9%9B%86%E7%BE%A4/index.html">
+<meta property="og:site_name" content="Me">
+<meta property="og:description" content="参考： docker redis4.0 集群（cluster）搭建 创建redis容器1.创建配置文件要搭建集群的文件夹下创建redis-cluster.tmpl，内容为以下内容，根据需要更改我这里文件在&#x2F;root&#x2F;redis-cluster(后面会用到这个路径)下 port $&amp;#123;PORT&amp;#125; protected-mode no cluster-enabled yes clust">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-09-12T04:08:05.000Z">
+<meta property="article:modified_time" content="2021-07-06T11:16:16.791Z">
+<meta property="article:author" content="C.c">
+<meta property="article:tag" content="docker">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://cononyc.gitee.io/2019/09/12/%E4%BD%BF%E7%94%A8docker%E6%90%AD%E5%BB%BAredis%E9%9B%86%E7%BE%A4/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title> 使用docker搭建redis集群		 | Me</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Me</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://cononyc.gitee.io/2019/09/12/%E4%BD%BF%E7%94%A8docker%E6%90%AD%E5%BB%BAredis%E9%9B%86%E7%BE%A4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="C.c">
+      <meta itemprop="description" content="A Blog">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Me">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+           使用docker搭建redis集群		
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-09-12 12:08:05" itemprop="dateCreated datePublished" datetime="2019-09-12T12:08:05+08:00">2019-09-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-07-06 19:16:16" itemprop="dateModified" datetime="2021-07-06T19:16:16+08:00">2021-07-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/docker/" itemprop="url" rel="index">
+                    <span itemprop="name">docker</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>参考： <a target="_blank" rel="noopener" href="https://www.cnblogs.com/lianggp/p/8136222.html">docker redis4.0 集群（cluster）搭建</a></p>
+<h2 id="创建redis容器"><a href="#创建redis容器" class="headerlink" title="创建redis容器"></a>创建redis容器</h2><h3 id="1-创建配置文件"><a href="#1-创建配置文件" class="headerlink" title="1.创建配置文件"></a>1.创建配置文件</h3><p>要搭建集群的文件夹下创建redis-cluster.tmpl，内容为以下内容，根据需要更改我这里文件在<code>/root/redis-cluster</code>(后面会用到这个路径)下</p>
+<pre><code>port $&#123;PORT&#125;
+protected-mode no
+cluster-enabled yes
+cluster-config-file nodes.conf
+cluster-node-timeout 5000
+cluster-announce-ip 39.10X.XX.XX //自己服务器IP
+cluster-announce-port $&#123;PORT&#125;
+cluster-announce-bus-port 1$&#123;PORT&#125;
+appendonly yes</code></pre><p>如果需要密码则加上配置</p>
+<pre><code>masterauth 123456
+requirepass 123456</code></pre><p>注：5.x以下版本不支持在创建集群的时候指定密码，所以要先创建好集群之后，再设置密码，5.x+版本支持在创建集群的时候指定参数<code>-a</code>来指定创建集群时候密码</p>
+<h3 id="2-docker创建集群的网络"><a href="#2-docker创建集群的网络" class="headerlink" title="2.docker创建集群的网络"></a>2.docker创建集群的网络</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker network create redis-net</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="3-生成配置信息"><a href="#3-生成配置信息" class="headerlink" title="3.生成配置信息"></a>3.生成配置信息</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> port <span class="keyword">in</span> `seq 7000 7005`; <span class="keyword">do</span> \</span><br><span class="line">  mkdir -p ./<span class="variable">$&#123;port&#125;</span>/conf \</span><br><span class="line">  &amp;&amp; PORT=<span class="variable">$&#123;port&#125;</span> envsubst &lt; ./redis-cluster.tmpl &gt; ./<span class="variable">$&#123;port&#125;</span>/conf/redis.conf \</span><br><span class="line">  &amp;&amp; mkdir -p ./<span class="variable">$&#123;port&#125;</span>/data; \</span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+
+
+<p>执行之后会在当前目录下生成 7000-7005的文件夹，对应不同的端口，里面包含conf和data文件夹</p>
+<h3 id="4-创建redis容器"><a href="#4-创建redis容器" class="headerlink" title="4.创建redis容器"></a>4.创建redis容器</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> port <span class="keyword">in</span> `seq 7000 7005`; <span class="keyword">do</span> \</span><br><span class="line">  docker run -d -ti -p <span class="variable">$&#123;port&#125;</span>:<span class="variable">$&#123;port&#125;</span> -p 1<span class="variable">$&#123;port&#125;</span>:1<span class="variable">$&#123;port&#125;</span> \</span><br><span class="line">  -v /root/redis-cluster/<span class="variable">$&#123;port&#125;</span>/conf/redis.conf:/usr/<span class="built_in">local</span>/etc/redis/redis.conf \</span><br><span class="line">  -v /root/redis-cluster/<span class="variable">$&#123;port&#125;</span>/data:/data \</span><br><span class="line">  --restart always --name redis-<span class="variable">$&#123;port&#125;</span> --net redis-net \</span><br><span class="line">  redis:4.0 redis-server /usr/<span class="built_in">local</span>/etc/redis/redis.conf; \</span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+
+
+<p>这里会启动6个redis 打开端口7000-7005,17000-17005并映射到了主机，将端口文件夹中的配置文件挂载到容器中，端口文件夹中的data文件夹挂载到容器中的/data下并自动重启 注：这里使用的是redis的4.0版本</p>
+<h2 id="集群"><a href="#集群" class="headerlink" title="集群"></a>集群</h2><h3 id="3-x版本"><a href="#3-x版本" class="headerlink" title="3.x版本"></a>3.x版本</h3><p>redis在4.x+版本提供了对docker的友好支持，如果需要redis能够使用外网访问，最好使用redis4.x+版本。3.x版本使用docker的默认网络配置只能够创建内网能够访问的docker redis集群，如果需要外网能够访问可能要更改redis-net的网络模式为host，并使用<code>redis-trib.rb</code>来创建集群，这里没有做尝试。</p>
+<h3 id="4-x版本"><a href="#4-x版本" class="headerlink" title="4.x版本"></a>4.x版本</h3><p>使用ruby来指定redis的<code>redis-trib.rb</code>来创建集群 注：5.0的redis版本似乎不支持使用这种方式（5.0使用redis-cli来创建集群，使用5.0的话不需要使用ruby，用其中一个redis实例来执行redis-cli创建集群的命令即可），所以这里的<code>redis-trib.rb</code>文件需要使用5.0以下的版本，参考文章中的获取的<code>redis-trib.rb</code>是属于stable版本的，最新stable版本的似乎已经是5.0的了，所以这里需要去到redis5.0版本以下的源码中去获取该文件。</p>
+<h4 id="1-下载redis-trib-rb"><a href="#1-下载redis-trib-rb" class="headerlink" title="1.下载redis-trib.rb"></a>1.下载<code>redis-trib.rb</code></h4><p>下载redis4.x的源码文件（自行下载，这里不赘述），解压，我这里解压到<code>/root/redis-4.0.12</code>这个文件夹下的</p>
+<h4 id="2-使用ruby-redis-trib-rb-创建集群"><a href="#2-使用ruby-redis-trib-rb-创建集群" class="headerlink" title="2.使用ruby + redis-trib.rb 创建集群"></a>2.使用ruby + redis-trib.rb 创建集群</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> yes | docker run -i --rm -v /root/redis-4.0.12/src/redis-trib.rb:/redis-trib.rb --net redis-net ruby sh -c <span class="string">&#x27;\</span></span><br><span class="line"><span class="string">  gem install redis -v 4.0 \</span></span><br><span class="line"><span class="string">  &amp;&amp; ruby redis-trib.rb create --replicas 1 \</span></span><br><span class="line"><span class="string">  &#x27;</span><span class="string">&quot;<span class="subst">$(for port in `seq 7000 7005`; do \</span></span></span><br><span class="line"><span class="subst"><span class="string">    echo -n <span class="string">&quot;<span class="subst">$(docker inspect --format &#x27;&#123; &#123; (index .NetworkSettings.Networks <span class="string">&quot;redis-net&quot;</span>)</span>.IPAddress &#125;&#125;&#x27; &quot;</span>redis-$&#123;port&#125;<span class="string">&quot;)&quot;</span>:$&#123;port&#125; &#x27; &#x27; ; \</span></span></span><br><span class="line"><span class="subst"><span class="string">  done)</span>&quot;</span></span><br></pre></td></tr></table></figure>
+
+
+<p>这里就是将<code>/root/redis-4.0.12/src/redis-trib.rb</code>该文件挂载到容器的<code>/redis-trib.rb</code>这个目录下，然后使用ruby来执行该文件创建集群</p>
+<h3 id="5-x版本"><a href="#5-x版本" class="headerlink" title="5.x版本"></a>5.x版本</h3><p>5.x使用redis-cli来创建集群，所以这里不需要去挂载<code>redis-trib.rb</code>,单独启动一个5.x的redis实例，指定redis-cli创建集群的命令就可以了</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> yes | docker run -i --rm -p 6379 --net redis-net redis:5.0 \</span><br><span class="line">   redis-cli --cluster create \</span><br><span class="line">   $(<span class="keyword">for</span> port <span class="keyword">in</span> `seq 7000 7005`; <span class="keyword">do</span> \</span><br><span class="line">     <span class="built_in">echo</span> -n <span class="string">&quot;<span class="subst">$(docker inspect --format &#x27;&#123; &#123; (index .NetworkSettings.Networks <span class="string">&quot;redis-net&quot;</span>)</span>.IPAddress &#125;&#125;&#x27; &quot;</span>redis-<span class="variable">$&#123;port&#125;</span><span class="string">&quot;)&quot;</span>:<span class="variable">$&#123;port&#125;</span> <span class="string">&#x27; &#x27;</span> ; \</span><br><span class="line">     <span class="keyword">done</span>) $(<span class="built_in">echo</span> <span class="string">&quot;--cluster-replicas 1&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+
+<p>如果使用了密码加上配置（5.x+版本支持，在配置文件中加<code>masterauth</code> <code>requirepass</code>属性）</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-a 123456</span><br></pre></td></tr></table></figure>
+
+
+<p>即</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> yes | docker run -i --rm -p 6379 --net redis-net redis:5.0 \</span><br><span class="line">   redis-cli --cluster create \</span><br><span class="line">   $(<span class="keyword">for</span> port <span class="keyword">in</span> `seq 7000 7005`; <span class="keyword">do</span> \</span><br><span class="line">     <span class="built_in">echo</span> -n <span class="string">&quot;<span class="subst">$(docker inspect --format &#x27;&#123; &#123; (index .NetworkSettings.Networks <span class="string">&quot;redis-net&quot;</span>)</span>.IPAddress &#125;&#125;&#x27; &quot;</span>redis-<span class="variable">$&#123;port&#125;</span><span class="string">&quot;)&quot;</span>:<span class="variable">$&#123;port&#125;</span> <span class="string">&#x27; &#x27;</span> ; \</span><br><span class="line">     <span class="keyword">done</span>) $(<span class="built_in">echo</span> <span class="string">&quot;--cluster-replicas 1 -a 123456&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+
+<p>注：</p>
+<ol>
+<li><p>操作环境为cento7</p>
+</li>
+<li><p>注意各种路径</p>
+</li>
+<li><p>执行之前要保证之前填的自己的IP的服务器的端口7000-7005,17000-17005端口是打开的，云服务器端口也要打开（如果需要外网连接的话），要不有可能一直卡在</p>
+<pre><code>Waiting for the cluster to join...</code></pre></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/docker/" rel="tag"># docker</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/08/23/mysql%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B/" rel="prev" title=" mysql存储过程		">
+      <i class="fa fa-chevron-left"></i>  mysql存储过程		
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/01/15/redis%E6%8C%81%E4%B9%85%E5%8C%96%E5%92%8C%E5%93%A8%E5%85%B5/" rel="next" title="redis持久化和哨兵">
+      redis持久化和哨兵 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BAredis%E5%AE%B9%E5%99%A8"><span class="nav-number">1.</span> <span class="nav-text">创建redis容器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%88%9B%E5%BB%BA%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="nav-number">1.1.</span> <span class="nav-text">1.创建配置文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-docker%E5%88%9B%E5%BB%BA%E9%9B%86%E7%BE%A4%E7%9A%84%E7%BD%91%E7%BB%9C"><span class="nav-number">1.2.</span> <span class="nav-text">2.docker创建集群的网络</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E7%94%9F%E6%88%90%E9%85%8D%E7%BD%AE%E4%BF%A1%E6%81%AF"><span class="nav-number">1.3.</span> <span class="nav-text">3.生成配置信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E5%88%9B%E5%BB%BAredis%E5%AE%B9%E5%99%A8"><span class="nav-number">1.4.</span> <span class="nav-text">4.创建redis容器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9B%86%E7%BE%A4"><span class="nav-number">2.</span> <span class="nav-text">集群</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-x%E7%89%88%E6%9C%AC"><span class="nav-number">2.1.</span> <span class="nav-text">3.x版本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-x%E7%89%88%E6%9C%AC"><span class="nav-number">2.2.</span> <span class="nav-text">4.x版本</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E4%B8%8B%E8%BD%BDredis-trib-rb"><span class="nav-number">2.2.1.</span> <span class="nav-text">1.下载redis-trib.rb</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E4%BD%BF%E7%94%A8ruby-redis-trib-rb-%E5%88%9B%E5%BB%BA%E9%9B%86%E7%BE%A4"><span class="nav-number">2.2.2.</span> <span class="nav-text">2.使用ruby + redis-trib.rb 创建集群</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-x%E7%89%88%E6%9C%AC"><span class="nav-number">2.3.</span> <span class="nav-text">5.x版本</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">C.c</p>
+  <div class="site-description" itemprop="description">A Blog</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/CaseCy" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;CaseCy" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://liquidcat.cc/" title="Blog → https:&#x2F;&#x2F;liquidcat.cc" rel="noopener" target="_blank"><i class="fa fa-fw fa-gratipay"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://gitee.com/cononyc" title="Gitee → https:&#x2F;&#x2F;gitee.com&#x2F;cononyc" rel="noopener" target="_blank"><i class="fa fa-fw fa-user-circle"></i></a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+  <div class="beian"><a href="http://beian.miit.gov.cn/" rel="noopener" target="_blank">蜀ICP备2021018575号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">C.c</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

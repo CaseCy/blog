@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://cononyc.gitee.io').hostname,
+    root: '/',
+    scheme: 'Mist',
+    version: '7.7.0',
+    exturl: false,
+    sidebar: {"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":false,"style":"flat"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="ruby1ruby更新 集群准备Redis的安装不赘述，参考Linux下安装Redis集群的官方参考文档Redis cluster准备一个redis配置文件redis.conf修改下面的内容 daemonize yes cluster-enabled yes cluster-config-file nodes.conf cluster-node-timeout 5000 appendonly ye">
+<meta property="og:type" content="article">
+<meta property="og:title" content=" Redis集群		">
+<meta property="og:url" content="https://cononyc.gitee.io/2018/10/19/redis%E9%9B%86%E7%BE%A4/index.html">
+<meta property="og:site_name" content="Me">
+<meta property="og:description" content="ruby1ruby更新 集群准备Redis的安装不赘述，参考Linux下安装Redis集群的官方参考文档Redis cluster准备一个redis配置文件redis.conf修改下面的内容 daemonize yes cluster-enabled yes cluster-config-file nodes.conf cluster-node-timeout 5000 appendonly ye">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2018-10-19T01:36:25.000Z">
+<meta property="article:modified_time" content="2021-07-06T11:16:16.788Z">
+<meta property="article:author" content="C.c">
+<meta property="article:tag" content="redis">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://cononyc.gitee.io/2018/10/19/redis%E9%9B%86%E7%BE%A4/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title> Redis集群		 | Me</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Me</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://cononyc.gitee.io/2018/10/19/redis%E9%9B%86%E7%BE%A4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="C.c">
+      <meta itemprop="description" content="A Blog">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Me">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+           Redis集群		
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-10-19 09:36:25" itemprop="dateCreated datePublished" datetime="2018-10-19T09:36:25+08:00">2018-10-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-07-06 19:16:16" itemprop="dateModified" datetime="2021-07-06T19:16:16+08:00">2021-07-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/redis/" itemprop="url" rel="index">
+                    <span itemprop="name">redis</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><a target="_blank" rel="noopener" href="https://ruby-china.org/wiki/rvm-guide">ruby1</a><br><a target="_blank" rel="noopener" href="http://www.jianshu.com/p/8169f5d7f364">ruby更新</a></p>
+<h2 id="集群准备"><a href="#集群准备" class="headerlink" title="集群准备"></a>集群准备</h2><p>Redis的安装不赘述，参考Linux下安装Redis<br>集群的官方参考文档<a target="_blank" rel="noopener" href="https://redis.io/topics/cluster-tutorial">Redis cluster</a><br>准备一个redis配置文件redis.conf<br>修改下面的内容</p>
+<pre><code>daemonize yes
+cluster-enabled yes
+cluster-config-file nodes.conf
+cluster-node-timeout 5000
+appendonly yes</code></pre><p><code>time-out</code>为参考<br>创建一个文件夹，作为Redis集群</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir redis_cluster</span><br></pre></td></tr></table></figure>
+<p>创建几个文件夹，作为单个redis文件存放地，这里使用端口7000-7005作为redis的集群端口</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir redis_700&#123;0,1,2,3,4,5&#125;</span><br></pre></td></tr></table></figure>
+<p>将上面的配置文件复制到上面单个redis的文件夹，并修改redis.conf中的<code>port</code>为对应端口，不赘述<br>分别切换到对应的端口文件夹</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis-server redis_7000/1/2/3/4/5.conf</span><br></pre></td></tr></table></figure>
+<p>启动每个redis<br>使用<code>ps -ef |grep redis</code>查看会看到</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">root     17703     1  0         00:00:19 redis-server 0.0.0.0:7000 [cluster]</span><br><span class="line">root     17708     1  0         00:00:19 redis-server 0.0.0.0:7001 [cluster]</span><br><span class="line">root     17713     1  0         00:00:19 redis-server 0.0.0.0:7002 [cluster]</span><br><span class="line">root     17720     1  0         00:00:19 redis-server 0.0.0.0:7003 [cluster]</span><br><span class="line">root     17730     1  0         00:00:19 redis-server 0.0.0.0:7004 [cluster]</span><br><span class="line">root     17735     1  0         00:00:19 redis-server 0.0.0.0:7005 [cluster]</span><br></pre></td></tr></table></figure>
+<p>redis都启动起来了<br>启动集群，切换到redis的安装目录下的<code>src</code>文件夹<br>执行</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./redis-trib.rb  create --replicas 1 127.0.0.1.41:7000 127.0.0.1:7001 127.0.0.1:7002 127.0.0.1:7003 127.0.0.1:7004 127.0.0.1:7005</span><br></pre></td></tr></table></figure>
+
+<p>注：如果是用外网访问redis的话一定要注意下面几点</p>
+<ul>
+<li>端口开放<br> 除了开放上面集群的端口，外网访问的时候还要开放集群端口+10000端口，如开放了7000端口，还要开放17000端口</li>
+<li>创建用的端口最好是服务器的公网ip，如果这里用127.0.0.1创建集群，会出现JedisCluster连接不上的情况，如果使用公网ip不开放+10000端口会出现<code>Waiting for the cluster to join...</code>一直阻塞的情况</li>
+<li>配置文件中的bind属性最好注释掉，这个属性是指定可以访问redis的ip的，需要外网访问的时候要注释掉</li>
+<li>配置文件中的<code>protected-mode no</code>保护模式可以关掉，不关掉会提示错误，这里如果bind了ip和设置了密码都可以忽略这个选项</li>
+</ul>
+<p>如果提示需要ruby，执行下面的命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">yum install ruby</span><br><span class="line">yum install rubygems</span><br></pre></td></tr></table></figure>
+
+<h2 id="Ruby安装和更新"><a href="#Ruby安装和更新" class="headerlink" title="Ruby安装和更新"></a>Ruby安装和更新</h2><p>使用上面的方式安装之后会发现ruby的版本为1.8.7，执行</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gem install  redis</span><br></pre></td></tr></table></figure>
+<p>会提示</p>
+<p>提示执行上面的步骤需要ruby2.2.2的版本，这里可以通过ruby的版本管理工具rvm来升级，也可以去官网下gz包去，配置环境变量指定<br>安装之前先将yum中的ruby卸载</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum remove -y ruby</span><br></pre></td></tr></table></figure>
+<p>访问<a target="_blank" rel="noopener" href="https://rvm.io/">rvm官网</a><br>执行</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg --keyserver hkp：//keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB</span><br></pre></td></tr></table></figure>
+<p>这个是官方提供的用来验证的公钥，以保证安全。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">\curl -sSL https://get.rvm.io | bash -s stable</span><br></pre></td></tr></table></figure>
+<p>安装稳定版本的rvm，会在看到下面的语句。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">* To start using RVM you need to run `<span class="built_in">source</span> /etc/profile.d/rvm.sh`</span><br><span class="line">    <span class="keyword">in</span> all your open shell windows, <span class="keyword">in</span> rare cases you need to reopen all shell windows.</span><br></pre></td></tr></table></figure>
+<p>执行上面的<code>source /etc/profile.d/rvm.sh</code>刷新就可以使用rvm命令了<br>列出已知版本</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rvm list known</span><br></pre></td></tr></table></figure>
+<p>安装ruby2.3</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rvm install 2.3</span><br></pre></td></tr></table></figure>
+<p>rvm支持多个版本的ruby同时在一个系统上，使用</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rvm use 2.3 或者 rvm use 2.3 --default 后面这个设置为默认</span><br></pre></td></tr></table></figure>
+<p>切换版本<br>使用</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rvm remove 2.3</span><br></pre></td></tr></table></figure>
+<p>卸载对应版本的ruby</p>
+<p>使用安装包的形式安装ruby可以参考<a target="_blank" rel="noopener" href="http://blog.csdn.net/coming789/article/details/42193531">安装ruby2.2.2</a></p>
+<h2 id="集群"><a href="#集群" class="headerlink" title="集群"></a>集群</h2><p>安装和升级好ruby之后</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gem install  redis</span><br></pre></td></tr></table></figure>
+<p>在gem中安装redis，后面加<code>-v 版本号</code>可以指定安装的版本，使用<code>gem uninstall redis</code>卸载</p>
+<p>如果安装很慢可以添加gem仓库</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">gem sources -a https://ruby.taobao.org/</span><br><span class="line">gem sources -a https://gems.ruby-china.org/</span><br></pre></td></tr></table></figure>
+<p>使用<code>gem source</code>查看仓库，使用<code>gem source -r url</code>移除，<code>gem sources -u</code>更新<br>然后再执行</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./redis-trib.rb  create --replicas 1 127.0.0.1.41:7000 127.0.0.1:7001 127.0.0.1:7002 127.0.0.1:7003 127.0.0.1:7004 127.0.0.1:7005</span><br></pre></td></tr></table></figure>
+<p>就可以看到</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; Creating cluster</span><br></pre></td></tr></table></figure>
+<p>在创建集群了<br>一些集群的操作参考：<a target="_blank" rel="noopener" href="http://www.cnblogs.com/wxd0108/p/5798332.html">集群命令</a></p>
+<hr>
+<p>集群删除节点</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./redis-trib.rb del-node [node-id] [node-id]</span><br></pre></td></tr></table></figure>
+<p>这个node-id可以在删除的nodes.conf中看到<br>也可以连接到集群执行<code>cluster nodes</code>查看集群信息，执行<br>参考<a target="_blank" rel="noopener" href="http://blog.csdn.net/xu470438000/article/details/42972123">redis集群动态增加或者删除节点</a><br>一些问题的解决方案参考<a target="_blank" rel="noopener" href="http://blog.csdn.net/ownfire/article/details/46624005">集群问题</a><br>停掉指定端口的redis</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis-cli -p port shutdown  //port为端口号</span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="http://www.mamicode.com/info-detail-1225600.html">集群</a><br><a target="_blank" rel="noopener" href="http://hot66hot.iteye.com/blog/2050676">集群</a></p>
+<hr>
+<p>访问集群要使用</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis-cli -c -p port</span><br></pre></td></tr></table></figure>
+<p>来访问，如果不行的话需要加上ip</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis-cli -c -h ip -p port</span><br></pre></td></tr></table></figure>
+
+<p>如果一直出现连接问题，要修改<code>/etc/hosts</code>文件，详见<a target="_blank" rel="noopener" href="http://blog.csdn.net/xlgen157387/article/details/52702659">内网ip？？</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/redis/" rel="tag"># redis</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/10/19/restful%E9%A3%8E%E6%A0%BC/" rel="prev" title=" RESTful风格		">
+      <i class="fa fa-chevron-left"></i>  RESTful风格		
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/10/19/%E6%9C%AA%E5%88%86%E7%B1%BB/" rel="next" title=" 未分类		">
+       未分类		 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9B%86%E7%BE%A4%E5%87%86%E5%A4%87"><span class="nav-number">1.</span> <span class="nav-text">集群准备</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Ruby%E5%AE%89%E8%A3%85%E5%92%8C%E6%9B%B4%E6%96%B0"><span class="nav-number">2.</span> <span class="nav-text">Ruby安装和更新</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9B%86%E7%BE%A4"><span class="nav-number">3.</span> <span class="nav-text">集群</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">C.c</p>
+  <div class="site-description" itemprop="description">A Blog</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/CaseCy" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;CaseCy" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://liquidcat.cc/" title="Blog → https:&#x2F;&#x2F;liquidcat.cc" rel="noopener" target="_blank"><i class="fa fa-fw fa-gratipay"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://gitee.com/cononyc" title="Gitee → https:&#x2F;&#x2F;gitee.com&#x2F;cononyc" rel="noopener" target="_blank"><i class="fa fa-fw fa-user-circle"></i></a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+  <div class="beian"><a href="http://beian.miit.gov.cn/" rel="noopener" target="_blank">蜀ICP备2021018575号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">C.c</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

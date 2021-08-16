@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://cononyc.gitee.io').hostname,
+    root: '/',
+    scheme: 'Mist',
+    version: '7.7.0',
+    exturl: false,
+    sidebar: {"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":false,"style":"flat"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="参考 Let’s Encrypt泛域名SSL证书申请 快速签发 Let’s Encrypt 证书指南 acme.sh 配合 letsencrypt 配置泛域名 acme.sh的GitHub 安装必备软件 1yum install -y curl socat cron  安装acme.sh 1curl https:&#x2F;&#x2F;get.acme.sh | sh  整个安装过程进行了以下几步，了解一下即可：">
+<meta property="og:type" content="article">
+<meta property="og:title" content=" Let&#39;s Encrypt泛域名SSL证书配置		">
+<meta property="og:url" content="https://cononyc.gitee.io/2019/04/09/lets-encrypt%E6%B3%9B%E5%9F%9F%E5%90%8Dssl%E8%AF%81%E4%B9%A6%E9%85%8D%E7%BD%AE/index.html">
+<meta property="og:site_name" content="Me">
+<meta property="og:description" content="参考 Let’s Encrypt泛域名SSL证书申请 快速签发 Let’s Encrypt 证书指南 acme.sh 配合 letsencrypt 配置泛域名 acme.sh的GitHub 安装必备软件 1yum install -y curl socat cron  安装acme.sh 1curl https:&#x2F;&#x2F;get.acme.sh | sh  整个安装过程进行了以下几步，了解一下即可：">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-04-09T01:53:35.000Z">
+<meta property="article:modified_time" content="2021-07-06T11:16:16.784Z">
+<meta property="article:author" content="C.c">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://cononyc.gitee.io/2019/04/09/lets-encrypt%E6%B3%9B%E5%9F%9F%E5%90%8Dssl%E8%AF%81%E4%B9%A6%E9%85%8D%E7%BD%AE/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title> Let's Encrypt泛域名SSL证书配置		 | Me</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Me</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://cononyc.gitee.io/2019/04/09/lets-encrypt%E6%B3%9B%E5%9F%9F%E5%90%8Dssl%E8%AF%81%E4%B9%A6%E9%85%8D%E7%BD%AE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="C.c">
+      <meta itemprop="description" content="A Blog">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Me">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+           Let's Encrypt泛域名SSL证书配置		
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-04-09 09:53:35" itemprop="dateCreated datePublished" datetime="2019-04-09T09:53:35+08:00">2019-04-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-07-06 19:16:16" itemprop="dateModified" datetime="2021-07-06T19:16:16+08:00">2021-07-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%9D%82/" itemprop="url" rel="index">
+                    <span itemprop="name">杂</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>参考</p>
+<p><a target="_blank" rel="noopener" href="https://www.laozuo.org/11668.html">Let’s Encrypt泛域名SSL证书申请</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/esofar/p/9291685.html">快速签发 Let’s Encrypt 证书指南</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/dbe180979e77">acme.sh 配合 letsencrypt 配置泛域名</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/Neilpang/acme.sh">acme.sh的GitHub</a></p>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>必备软件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install -y curl socat cron</span><br></pre></td></tr></table></figure>
+
+<p>安装acme.sh</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl https://get.acme.sh | sh</span><br></pre></td></tr></table></figure>
+
+<p>整个安装过程进行了以下几步，了解一下即可：</p>
+<ol>
+<li>把 acme.sh 安装到当前用户的主目录<code>$HOME</code>下的<code>.acme.sh</code>文件夹中，即<code>~/.acme.sh/</code>，之后所有生成的证书也会放在这个目录下；</li>
+<li>创建了一个指令别名<code>alias acme.sh=~/.acme.sh/acme.sh</code>，这样我们可以通过<code>acme.sh</code>命令方便快速地使用 acme.sh 脚本；</li>
+<li>自动创建<code>cronjob</code>定时任务, 每天 0:00 点自动检测所有的证书，如果快过期了，则会自动更新证书。</li>
+</ol>
+<p>安装命令执行完毕后，执行<code>acme.sh --version</code>确认是否能正常使用<code>acme.sh</code>命令。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> ~/.acme.sh/</span><br><span class="line">./acme.sh --version</span><br><span class="line">-------------------------------</span><br><span class="line">https://github.com/Neilpang/acme.sh</span><br><span class="line">v2.8.1</span><br></pre></td></tr></table></figure>
+
+<p>更高级的安装选项请参考: <a target="_blank" rel="noopener" href="https://github.com/Neilpang/acme.sh/wiki/How-to-install">https://github.com/Neilpang/acme.sh/wiki/How-to-install</a></p>
+<h2 id="生成证书"><a href="#生成证书" class="headerlink" title="生成证书"></a>生成证书</h2><p><code>acme.sh</code> 支持直接使用主流 DNS 提供商的 API 接口来完成域名验证以及一些相关操作具体 <a target="_blank" rel="noopener" href="https://github.com/Neilpang/acme.sh/tree/master/dnsapi">dnsapi 链接</a></p>
+<p>以阿里云为例：</p>
+<p>首先获取你的阿里云API Key: <a target="_blank" rel="noopener" href="https://ak-console.aliyun.com/#/accesskey">https://ak-console.aliyun.com/#/accesskey</a></p>
+<p>注：如果使用阿里RAM访问权限控制，需要授权<code>管理HTTPDNS的权限</code> <code>管理云解析(DNS)的权限</code>这两个权限</p>
+<p>编辑acme.sh，加入</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="builtin-name">export</span> <span class="attribute">Ali_Key</span>=<span class="string">&quot;自己的AccessKeyID&quot;</span></span><br><span class="line"><span class="builtin-name">export</span> <span class="attribute">Ali_Secret</span>=<span class="string">&quot;自己的AccessKeySecret&quot;</span></span><br></pre></td></tr></table></figure>
+<p>然后执行</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./acme.sh --issue -d 域名 -d *.域名 --dns dns_ali --<span class="built_in">log</span></span><br></pre></td></tr></table></figure>
+
+<p><code>--log</code>表示生成日志文件<code>acme.sh.log</code>，方便生成失败的时候查看原因</p>
+<p>如果想自定义证书目录可以加上<code>-w</code>参数</p>
+<h2 id="Nginx配置SSL"><a href="#Nginx配置SSL" class="headerlink" title="Nginx配置SSL"></a>Nginx配置SSL</h2><p>Nginx支持SSL要先安装ssl模块<code>--with-http_ssl_module</code></p>
+<p>生成dhparam</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo mkdir /usr/<span class="built_in">local</span>/nginx/ssl</span><br><span class="line">sudo openssl dhparam -out /usr/<span class="built_in">local</span>/nginx/ssl/dhparam.pem 2048</span><br></pre></td></tr></table></figure>
+
+<p>生成会生成一段时间</p>
+<h3 id="安装证书"><a href="#安装证书" class="headerlink" title="安装证书"></a>安装证书</h3><p>生成的证书是放在<code>~/acme.sh/域名</code>下的，这是<code>acme</code>内部目录，不应该让nginx直接读取，所以使用<code>--installcert</code>命令将证书文件放到其他位置</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">./acme.sh  --installcert -d 域名 \</span><br><span class="line">         --key-file /usr/<span class="built_in">local</span>/nginx/ssl/域名.key \</span><br><span class="line">         --fullchain-file /usr/<span class="built_in">local</span>/nginx/ssl/fullchain.cer \</span><br><span class="line">         --reloadcmd <span class="string">&quot;service nginx force-reload&quot;</span></span><br><span class="line">------------或者--------------</span><br><span class="line">./acme.sh --installcert -d 域名 -key-file /usr/<span class="built_in">local</span>/nginx/ssl/域名.key --fullchain-file /usr/<span class="built_in">local</span>/nginx/ssl/fullchain.cer --reloadcmd <span class="string">&quot;server nginx force-reload&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>注：<code>--reloadcmd</code>可以不加，这个表示安装完成后执行的命令，但是最好是填上，基本每隔两个月就会执行一次，就需要重载或重启nginx证书才能及时的更新</p>
+<h3 id="配置Nginx"><a href="#配置Nginx" class="headerlink" title="配置Nginx"></a>配置Nginx</h3><p>这里只展示了必要配置</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">server</span> &#123;</span><br><span class="line">    <span class="attribute">listen</span>      <span class="number">80</span>;</span><br><span class="line">    <span class="attribute">server_name</span> 域名;</span><br><span class="line">    <span class="comment"># 访问80端口重定向到https端口</span></span><br><span class="line">    <span class="attribute">return</span> <span class="number">301</span> https://$host$request_uri;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="section">server</span> &#123;</span><br><span class="line">    <span class="attribute">listen</span>       <span class="number">443</span> ssl http2;</span><br><span class="line">    <span class="attribute">ssl</span> <span class="literal">on</span>;</span><br><span class="line">    <span class="attribute">server_name</span>  域名;</span><br><span class="line">    <span class="attribute">ssl_certificate</span> /usr/local/nginx/ssl/fullchain.cer;</span><br><span class="line">    <span class="attribute">ssl_certificate_key</span> /usr/local/nginx/ssl/域名.key;</span><br><span class="line">    <span class="attribute">ssl_dhparam</span> /usr/local/nginx/ssl/dhparam.pem;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>ssl的详细设置可以查看<a target="_blank" rel="noopener" href="http://nginx.org/en/docs/http/ngx_http_ssl_module.html">Module ngx_http_ssl_module</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/04/08/wordpress-docker%E6%90%AD%E5%BB%BA-https%E5%8C%96%E8%AE%B0%E5%BD%95/" rel="prev" title=" wordpress docker搭建 https化记录		">
+      <i class="fa fa-chevron-left"></i>  wordpress docker搭建 https化记录		
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/08/23/mysql%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B/" rel="next" title=" mysql存储过程		">
+       mysql存储过程		 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85"><span class="nav-number">1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%9F%E6%88%90%E8%AF%81%E4%B9%A6"><span class="nav-number">2.</span> <span class="nav-text">生成证书</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Nginx%E9%85%8D%E7%BD%AESSL"><span class="nav-number">3.</span> <span class="nav-text">Nginx配置SSL</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%85%E8%AF%81%E4%B9%A6"><span class="nav-number">3.1.</span> <span class="nav-text">安装证书</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%85%8D%E7%BD%AENginx"><span class="nav-number">3.2.</span> <span class="nav-text">配置Nginx</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">C.c</p>
+  <div class="site-description" itemprop="description">A Blog</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/CaseCy" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;CaseCy" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://liquidcat.cc/" title="Blog → https:&#x2F;&#x2F;liquidcat.cc" rel="noopener" target="_blank"><i class="fa fa-fw fa-gratipay"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://gitee.com/cononyc" title="Gitee → https:&#x2F;&#x2F;gitee.com&#x2F;cononyc" rel="noopener" target="_blank"><i class="fa fa-fw fa-user-circle"></i></a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+  <div class="beian"><a href="http://beian.miit.gov.cn/" rel="noopener" target="_blank">蜀ICP备2021018575号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">C.c</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

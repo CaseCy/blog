@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://cononyc.gitee.io').hostname,
+    root: '/',
+    scheme: 'Mist',
+    version: '7.7.0',
+    exturl: false,
+    sidebar: {"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":false,"style":"flat"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="参考： Mysql存储过程 DECLARE … HANDLER 存储过程的创建1CREATE PROCEDURE 存储过程名()   存储过程的删除12-- 删除存储过程后面不需要跟(),只给出存储过程名DROP PROCEDURE productpricing;        删除时先判断是否存在1DROP PROCEDURE IF EXISTS productpricing   Mysql命令">
+<meta property="og:type" content="article">
+<meta property="og:title" content=" mysql存储过程		">
+<meta property="og:url" content="https://cononyc.gitee.io/2019/08/23/mysql%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B/index.html">
+<meta property="og:site_name" content="Me">
+<meta property="og:description" content="参考： Mysql存储过程 DECLARE … HANDLER 存储过程的创建1CREATE PROCEDURE 存储过程名()   存储过程的删除12-- 删除存储过程后面不需要跟(),只给出存储过程名DROP PROCEDURE productpricing;        删除时先判断是否存在1DROP PROCEDURE IF EXISTS productpricing   Mysql命令">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-08-23T07:09:15.000Z">
+<meta property="article:modified_time" content="2021-07-06T11:16:16.785Z">
+<meta property="article:author" content="C.c">
+<meta property="article:tag" content="mysql">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://cononyc.gitee.io/2019/08/23/mysql%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title> mysql存储过程		 | Me</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Me</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://cononyc.gitee.io/2019/08/23/mysql%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="C.c">
+      <meta itemprop="description" content="A Blog">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Me">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+           mysql存储过程		
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-08-23 15:09:15" itemprop="dateCreated datePublished" datetime="2019-08-23T15:09:15+08:00">2019-08-23</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-07-06 19:16:16" itemprop="dateModified" datetime="2021-07-06T19:16:16+08:00">2021-07-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mysql/" itemprop="url" rel="index">
+                    <span itemprop="name">mysql</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>参考： <a target="_blank" rel="noopener" href="https://www.cnblogs.com/l5580/p/5993238.html">Mysql存储过程</a> <a target="_blank" rel="noopener" href="http://imysql.com/mysql-refman/5.7/sql-syntax.html#declare-handler">DECLARE … HANDLER</a></p>
+<h2 id="存储过程的创建"><a href="#存储过程的创建" class="headerlink" title="存储过程的创建"></a>存储过程的创建</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">PROCEDURE</span> 存储过程名()</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="存储过程的删除"><a href="#存储过程的删除" class="headerlink" title="存储过程的删除"></a>存储过程的删除</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 删除存储过程后面不需要跟(),只给出存储过程名</span></span><br><span class="line"><span class="keyword">DROP</span> <span class="keyword">PROCEDURE</span> productpricing;     </span><br></pre></td></tr></table></figure>
+
+
+<h3 id="删除时先判断是否存在"><a href="#删除时先判断是否存在" class="headerlink" title="删除时先判断是否存在"></a>删除时先判断是否存在</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DROP</span> <span class="keyword">PROCEDURE</span> IF <span class="keyword">EXISTS</span> productpricing</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="Mysql命令行客户机的分隔符"><a href="#Mysql命令行客户机的分隔符" class="headerlink" title="Mysql命令行客户机的分隔符"></a>Mysql命令行客户机的分隔符</h2><p>默认的MySQL语句分隔符为分号;作为语句分隔符。如果命令行实用程序要解释存储过程自身的 ; 字符，则他们最终不会成为存储过程的成分，这会使存储过程中的SQL出现句法错误，解决方法是临时更改命令实用程序的语句分隔符，使用DELIMITER</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 定义新的语句分隔符为//</span></span><br><span class="line">DELIMITER <span class="operator">/</span><span class="operator">/</span>    </span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">PROCEDURE</span> productpricing()</span><br><span class="line"><span class="comment">-- 表示开始存储过程</span></span><br><span class="line"><span class="keyword">BEGIN</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> <span class="built_in">Avg</span>(prod_price) <span class="keyword">AS</span> priceaverage</span><br><span class="line"></span><br><span class="line"><span class="keyword">FROM</span> products;</span><br><span class="line"><span class="comment">-- 表示存储过程结束</span></span><br><span class="line"><span class="keyword">END</span> <span class="operator">/</span><span class="operator">/</span></span><br><span class="line"><span class="comment">-- 改回原来的语句分隔符为;</span></span><br><span class="line">DELIMITER ;    </span><br><span class="line"><span class="comment">-- 除\符号外，任何字符都可以作为语句分隔符</span></span><br></pre></td></tr></table></figure>
+
+
+<h2 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h2><h3 id="入参"><a href="#入参" class="headerlink" title="入参"></a>入参</h3><p>创建存储过程时指定</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 每个参数都要指定类型</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">PROCEDURE</span> productpricing(</span><br><span class="line">    <span class="keyword">IN</span> param1 <span class="type">VARCHAR</span>(<span class="number">50</span>),</span><br><span class="line">    <span class="keyword">IN</span> param2 <span class="type">Integer</span>(<span class="number">11</span>)</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="出参（返回值）"><a href="#出参（返回值）" class="headerlink" title="出参（返回值）"></a>出参（返回值）</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 每个参数都要指定类型 DEFAULT用于指定默认值</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">PROCEDURE</span> productpricing(</span><br><span class="line">    <span class="keyword">IN</span> param1 <span class="type">VARCHAR</span>(<span class="number">50</span>) <span class="keyword">DEFAULT</span> &quot;&quot;,</span><br><span class="line">    <span class="keyword">IN</span> param2 <span class="type">INT</span>(<span class="number">11</span>),</span><br><span class="line">    <span class="keyword">OUT</span> param3 <span class="type">DECIMAL</span>(<span class="number">8</span>,<span class="number">2</span>)</span><br><span class="line">    <span class="keyword">OUT</span> param4 <span class="type">TIMESTAMP</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+
+<h4 id="调用"><a href="#调用" class="headerlink" title="调用"></a>调用</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 这里调用时指定了出参的变量，前面要加@</span></span><br><span class="line"><span class="keyword">CALL</span> productpricing(&quot;调用入参&quot;,<span class="number">11</span>,<span class="variable">@outParam1</span>,<span class="variable">@outParam2</span>);</span><br><span class="line"><span class="keyword">select</span> <span class="variable">@outParam1</span>,<span class="variable">@outParam2</span></span><br></pre></td></tr></table></figure>
+
+
+<h3 id="局部变量"><a href="#局部变量" class="headerlink" title="局部变量"></a>局部变量</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 定义局部变量，局部变量声明要放在存储过程开始的地方</span></span><br><span class="line"><span class="keyword">DECLARE</span> x <span class="type">VARCHAR</span>(<span class="number">11</span>);</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="查询赋值"><a href="#查询赋值" class="headerlink" title="查询赋值"></a>查询赋值</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DECLARE</span> _roleId <span class="type">INT</span>(<span class="number">11</span>);</span><br><span class="line"><span class="keyword">DECLARE</span> _roleName <span class="type">VARCHAR</span>(<span class="number">20</span>);</span><br><span class="line"><span class="comment">-- 可以使用INTO将查询语句中的列结果赋值给变量</span></span><br><span class="line"><span class="keyword">SELECT</span> role_id,role_name</span><br><span class="line"><span class="keyword">INTO</span> _roleId,_roleName</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">sys_role</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="设置变量的值"><a href="#设置变量的值" class="headerlink" title="设置变量的值"></a>设置变量的值</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SET</span> x <span class="operator">=</span> <span class="number">5</span>;</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="流程控制语句"><a href="#流程控制语句" class="headerlink" title="流程控制语句"></a>流程控制语句</h2><h3 id="IF"><a href="#IF" class="headerlink" title="IF"></a>IF</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- IF</span></span><br><span class="line">IF x <span class="operator">=</span> <span class="number">5</span> <span class="keyword">THEN</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> sys_role;</span><br><span class="line"><span class="comment">-- ELSEIF</span></span><br><span class="line">ELSEIF x <span class="operator">=</span> <span class="number">6</span> <span class="keyword">THEN</span></span><br><span class="line"><span class="keyword">SELECT</span> id <span class="keyword">FROM</span> sys_role;</span><br><span class="line"><span class="comment">-- ELSE 这里不用写THEN</span></span><br><span class="line"><span class="keyword">ELSE</span></span><br><span class="line"><span class="keyword">SELECT</span> role_name <span class="keyword">FROM</span> sys_role;</span><br><span class="line"><span class="comment">-- IF执行之后一定要END IF，这里有;</span></span><br><span class="line"><span class="keyword">END</span> IF;</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="Case语句"><a href="#Case语句" class="headerlink" title="Case语句"></a>Case语句</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CASE</span> [<span class="keyword">case</span>值]</span><br><span class="line"><span class="keyword">WHEN</span> [条件] <span class="keyword">THEN</span> [执行的内容]</span><br><span class="line"><span class="keyword">WHEN</span> [条件] <span class="keyword">THEN</span> [执行的内容] </span><br><span class="line"><span class="keyword">ELSE</span> [执行的内容]</span><br><span class="line"><span class="keyword">End</span> <span class="keyword">CASE</span></span><br></pre></td></tr></table></figure>
+
+
+<h2 id="游标"><a href="#游标" class="headerlink" title="游标"></a>游标</h2><p>游标（cursor）是一个存储在MYSQL服务器上的数据库查询，它不是一条SELECT语句，而是被该语句检索出来的结果集。在存储了游标之后，应用程序可以根据需要滚动或浏览其中的数据。游标主要用于交互式应用，其中用户需要滚动屏幕上的数据，并对数据进行浏览或做出更改。 <strong>使用游标</strong> 使用游标涉及几个明确的步骤：</p>
+<ol>
+<li><p>在能够使用游标前，必须声明（定义）它，这个过程实际上没有检索数据，它只是定义要使用的SELECT语句</p>
+</li>
+<li><p>一旦声明后，必须打开游标以供使用。这个过程用钱吗定义的SELECT语句吧数据实际检索出来</p>
+</li>
+<li><p>对于填有数据的游标，根据需要取出（检索）的各行</p>
+</li>
+<li><p>在接受游标使用时，必须关闭它 <strong>如果不明确关闭游标，MySQL将会在到达END语句时自动关闭它</strong></p>
+</li>
+</ol>
+<h3 id="创建游标"><a href="#创建游标" class="headerlink" title="创建游标"></a>创建游标</h3><p>游标可用DECLARE 语句创建。 DECLARE命名游标，并定义相应的SELECT语句。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DECLARE</span> [游标名称] <span class="keyword">CURSOR</span> <span class="keyword">FOR</span> [查询语句];</span><br><span class="line"><span class="comment">-- 例子</span></span><br><span class="line"><span class="keyword">DECLARE</span> cur <span class="keyword">CURSOR</span> <span class="keyword">FOR</span> <span class="keyword">SELECT</span> role_id <span class="keyword">FROM</span> sys_role;</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="打开和关闭游标"><a href="#打开和关闭游标" class="headerlink" title="打开和关闭游标"></a>打开和关闭游标</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">OPEN</span> [游标名称];</span><br><span class="line"><span class="comment">-- CLOSE释放游标使用的所有内部内存和资源，因此，每个游标不需要时都应该关闭</span></span><br><span class="line"><span class="keyword">CLOSE</span> [游标名称];</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="使用游标数据"><a href="#使用游标数据" class="headerlink" title="使用游标数据"></a>使用游标数据</h3><p>在一个游标被打开后，可以使用FETCH语句分别访问它的每一行。FETCH指定检索什么数据（所需的要列），检索出来的数据存储在什么地方。它还向前移动游标中的内部行指针，使下一条FETCH语句检索下一行从第一行到最后一行</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 每次FETCH取的是一行的数据</span></span><br><span class="line"><span class="keyword">FETCH</span> cura <span class="keyword">INTO</span> userId,roleId,roleName;</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="循环"><a href="#循环" class="headerlink" title="循环"></a>循环</h3><p>有几种循环游标的方式</p>
+<ul>
+<li>WHILE [循环条件] DO [循环体] END WHILE</li>
+<li>REPEAT [循环体] UNTIL [结束标志] END REPEAT;</li>
+<li>loop名称:LOOP …… END LOOP; 使用 LEAVE [loop名称] 可以 离开LOOP循环</li>
+</ul>
+<p>定义循环结束的标志</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DECLARE</span> CONTINUE HANDLER <span class="keyword">FOR</span> <span class="keyword">SQLSTATE</span> <span class="string">&#x27;02000&#x27;</span> <span class="keyword">SET</span> [变量]<span class="operator">=</span><span class="literal">TRUE</span>;</span><br><span class="line"><span class="comment">-- 或者下面的也可以</span></span><br><span class="line"><span class="keyword">DECLARE</span> CONTINUE HANDLER <span class="keyword">FOR</span> <span class="keyword">NOT</span> FOUND <span class="keyword">SET</span> [变量] <span class="operator">=</span> <span class="literal">TRUE</span>;</span><br></pre></td></tr></table></figure>
+
+
+<p>关于MYSQL的DECLARE…HANDLER用法可以参考 <a target="_blank" rel="noopener" href="http://imysql.com/mysql-refman/5.7/sql-syntax.html#declare-handler">DECLARE … HANDLER</a></p>
+<h2 id="比较完整的例子"><a href="#比较完整的例子" class="headerlink" title="比较完整的例子"></a>比较完整的例子</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 如果存在就删除</span></span><br><span class="line"><span class="keyword">DROP</span> <span class="keyword">PROCEDURE</span> IF <span class="keyword">EXISTS</span> testPro;</span><br><span class="line"><span class="comment">-- 定义分隔符</span></span><br><span class="line">DELIMITER <span class="operator">/</span><span class="operator">/</span></span><br><span class="line"><span class="comment">-- 创建存储过程</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">PROCEDURE</span> testPro(</span><br><span class="line">    <span class="keyword">IN</span> inParam <span class="type">Int</span>(<span class="number">11</span>),</span><br><span class="line">    <span class="keyword">OUT</span> outParam <span class="type">VARCHAR</span>(<span class="number">20</span>)</span><br><span class="line">)</span><br><span class="line"><span class="keyword">BEGIN</span></span><br><span class="line">    <span class="comment">-- 定义局部变量</span></span><br><span class="line">    <span class="keyword">DECLARE</span> _roleName <span class="type">VARCHAR</span>(<span class="number">20</span>);</span><br><span class="line">    <span class="keyword">DECLARE</span> done BIT <span class="keyword">DEFAULT</span> <span class="literal">FALSE</span>;</span><br><span class="line">    <span class="keyword">DECLARE</span> roleName <span class="type">VARCHAR</span>(<span class="number">50</span>);</span><br><span class="line">    <span class="keyword">DECLARE</span> roleId <span class="type">INT</span>(<span class="number">11</span>);</span><br><span class="line">    <span class="keyword">DECLARE</span> userId <span class="type">INT</span>(<span class="number">11</span>);</span><br><span class="line">    <span class="comment">-- 定义一个游标</span></span><br><span class="line">    <span class="keyword">DECLARE</span> cura <span class="keyword">CURSOR</span> <span class="keyword">FOR</span> <span class="keyword">SELECT</span> id,role_id,role_name <span class="keyword">FROM</span> sys_user;</span><br><span class="line">    <span class="keyword">DECLARE</span> CONTINUE HANDLER <span class="keyword">FOR</span> <span class="keyword">SQLSTATE</span> <span class="string">&#x27;02000&#x27;</span> <span class="keyword">SET</span> done<span class="operator">=</span><span class="literal">TRUE</span>;</span><br><span class="line">    <span class="comment">-- 也可以这样写DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;</span></span><br><span class="line">    <span class="comment">-- 查询表</span></span><br><span class="line">    <span class="keyword">SELECT</span> role_name</span><br><span class="line">    <span class="comment">-- 将查询的结果赋值给_roleName</span></span><br><span class="line">    <span class="keyword">INTO</span> _roleName</span><br><span class="line">    <span class="keyword">FROM</span> sys_role <span class="keyword">WHERE</span> role_id <span class="operator">=</span> inParam;</span><br><span class="line">    <span class="comment">-- 设置outParam的值</span></span><br><span class="line">    IF _roleName <span class="operator">=</span> &quot;ADMIN&quot; <span class="keyword">THEN</span></span><br><span class="line">        <span class="keyword">SET</span> outParam <span class="operator">=</span> &quot;管理员&quot;;</span><br><span class="line">    ELSEIF _roleName <span class="operator">=</span> &quot;EMPLOYEE&quot; <span class="keyword">THEN</span></span><br><span class="line">        <span class="keyword">SET</span> outParam <span class="operator">=</span> &quot;员工&quot;;</span><br><span class="line">    <span class="keyword">ELSE</span></span><br><span class="line">        <span class="keyword">SET</span> outParam <span class="operator">=</span> &quot;未知&quot;;</span><br><span class="line">    <span class="keyword">END</span> IF;</span><br><span class="line">    <span class="comment">-- 打开游标</span></span><br><span class="line">    <span class="keyword">OPEN</span> cura;</span><br><span class="line">        <span class="comment">-- 循环</span></span><br><span class="line">        REPEAT</span><br><span class="line">            <span class="keyword">FETCH</span> cura <span class="keyword">INTO</span> userId,roleId,roleName;</span><br><span class="line">            IF roleId <span class="keyword">IS</span> <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">THEN</span></span><br><span class="line">                UPDATE sys_user <span class="keyword">SET</span> role_name <span class="operator">=</span> (<span class="keyword">SELECT</span> role_name <span class="keyword">FROM</span> sys_role <span class="keyword">WHERE</span> role_id <span class="operator">=</span> roleId) <span class="keyword">WHERE</span> id <span class="operator">=</span> userId;</span><br><span class="line">            <span class="keyword">END</span> IF;</span><br><span class="line">        UNTIL done <span class="keyword">END</span> REPEAT;</span><br><span class="line">    <span class="keyword">CLOSE</span> cura;</span><br><span class="line"><span class="keyword">END</span> <span class="operator">/</span><span class="operator">/</span></span><br><span class="line">DELIMITER ;</span><br><span class="line"><span class="comment">-- 调用</span></span><br><span class="line"><span class="keyword">CALL</span> testPro(<span class="number">2</span>,<span class="variable">@testOut</span>);</span><br><span class="line"><span class="keyword">SELECT</span> <span class="variable">@testOut</span>;</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/mysql/" rel="tag"># mysql</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/04/09/lets-encrypt%E6%B3%9B%E5%9F%9F%E5%90%8Dssl%E8%AF%81%E4%B9%A6%E9%85%8D%E7%BD%AE/" rel="prev" title=" Let's Encrypt泛域名SSL证书配置		">
+      <i class="fa fa-chevron-left"></i>  Let's Encrypt泛域名SSL证书配置		
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/09/12/%E4%BD%BF%E7%94%A8docker%E6%90%AD%E5%BB%BAredis%E9%9B%86%E7%BE%A4/" rel="next" title=" 使用docker搭建redis集群		">
+       使用docker搭建redis集群		 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B%E7%9A%84%E5%88%9B%E5%BB%BA"><span class="nav-number">1.</span> <span class="nav-text">存储过程的创建</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B%E7%9A%84%E5%88%A0%E9%99%A4"><span class="nav-number">2.</span> <span class="nav-text">存储过程的删除</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E6%97%B6%E5%85%88%E5%88%A4%E6%96%AD%E6%98%AF%E5%90%A6%E5%AD%98%E5%9C%A8"><span class="nav-number">2.1.</span> <span class="nav-text">删除时先判断是否存在</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Mysql%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%AE%A2%E6%88%B7%E6%9C%BA%E7%9A%84%E5%88%86%E9%9A%94%E7%AC%A6"><span class="nav-number">3.</span> <span class="nav-text">Mysql命令行客户机的分隔符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E6%95%B0"><span class="nav-number">4.</span> <span class="nav-text">参数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%A5%E5%8F%82"><span class="nav-number">4.1.</span> <span class="nav-text">入参</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BA%E5%8F%82%EF%BC%88%E8%BF%94%E5%9B%9E%E5%80%BC%EF%BC%89"><span class="nav-number">4.2.</span> <span class="nav-text">出参（返回值）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B0%83%E7%94%A8"><span class="nav-number">4.2.1.</span> <span class="nav-text">调用</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B1%80%E9%83%A8%E5%8F%98%E9%87%8F"><span class="nav-number">4.3.</span> <span class="nav-text">局部变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E8%AF%A2%E8%B5%8B%E5%80%BC"><span class="nav-number">4.4.</span> <span class="nav-text">查询赋值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%BE%E7%BD%AE%E5%8F%98%E9%87%8F%E7%9A%84%E5%80%BC"><span class="nav-number">4.5.</span> <span class="nav-text">设置变量的值</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%81%E7%A8%8B%E6%8E%A7%E5%88%B6%E8%AF%AD%E5%8F%A5"><span class="nav-number">5.</span> <span class="nav-text">流程控制语句</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#IF"><span class="nav-number">5.1.</span> <span class="nav-text">IF</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Case%E8%AF%AD%E5%8F%A5"><span class="nav-number">5.2.</span> <span class="nav-text">Case语句</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B8%B8%E6%A0%87"><span class="nav-number">6.</span> <span class="nav-text">游标</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E6%B8%B8%E6%A0%87"><span class="nav-number">6.1.</span> <span class="nav-text">创建游标</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%93%E5%BC%80%E5%92%8C%E5%85%B3%E9%97%AD%E6%B8%B8%E6%A0%87"><span class="nav-number">6.2.</span> <span class="nav-text">打开和关闭游标</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%B8%B8%E6%A0%87%E6%95%B0%E6%8D%AE"><span class="nav-number">6.3.</span> <span class="nav-text">使用游标数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BE%AA%E7%8E%AF"><span class="nav-number">6.4.</span> <span class="nav-text">循环</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AF%94%E8%BE%83%E5%AE%8C%E6%95%B4%E7%9A%84%E4%BE%8B%E5%AD%90"><span class="nav-number">7.</span> <span class="nav-text">比较完整的例子</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">C.c</p>
+  <div class="site-description" itemprop="description">A Blog</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/CaseCy" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;CaseCy" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://liquidcat.cc/" title="Blog → https:&#x2F;&#x2F;liquidcat.cc" rel="noopener" target="_blank"><i class="fa fa-fw fa-gratipay"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://gitee.com/cononyc" title="Gitee → https:&#x2F;&#x2F;gitee.com&#x2F;cononyc" rel="noopener" target="_blank"><i class="fa fa-fw fa-user-circle"></i></a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+  <div class="beian"><a href="http://beian.miit.gov.cn/" rel="noopener" target="_blank">蜀ICP备2021018575号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">C.c</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

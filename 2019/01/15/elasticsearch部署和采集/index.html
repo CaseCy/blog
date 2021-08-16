@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://cononyc.gitee.io').hostname,
+    root: '/',
+    scheme: 'Mist',
+    version: '7.7.0',
+    exturl: false,
+    sidebar: {"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":false,"style":"flat"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="部署分为几个部分1.Elasticsearch2.Logstash3.Kibanna4.Filebeats(可选)注：本文使用版本为5.3.3，以上内容均为此版本，官网传送门 elasticsearch安装安装之前，先建一个linux账号，因为elasticsearch不允许用root账号启动 创建用户组 1groupadd es 创建用户并分配到用户组 1useradd es -g es 以下e">
+<meta property="og:type" content="article">
+<meta property="og:title" content=" elasticsearch部署和采集		">
+<meta property="og:url" content="https://cononyc.gitee.io/2019/01/15/elasticsearch%E9%83%A8%E7%BD%B2%E5%92%8C%E9%87%87%E9%9B%86/index.html">
+<meta property="og:site_name" content="Me">
+<meta property="og:description" content="部署分为几个部分1.Elasticsearch2.Logstash3.Kibanna4.Filebeats(可选)注：本文使用版本为5.3.3，以上内容均为此版本，官网传送门 elasticsearch安装安装之前，先建一个linux账号，因为elasticsearch不允许用root账号启动 创建用户组 1groupadd es 创建用户并分配到用户组 1useradd es -g es 以下e">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-01-15T03:23:15.000Z">
+<meta property="article:modified_time" content="2021-07-06T11:16:16.781Z">
+<meta property="article:author" content="C.c">
+<meta property="article:tag" content="es">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://cononyc.gitee.io/2019/01/15/elasticsearch%E9%83%A8%E7%BD%B2%E5%92%8C%E9%87%87%E9%9B%86/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title> elasticsearch部署和采集		 | Me</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Me</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://cononyc.gitee.io/2019/01/15/elasticsearch%E9%83%A8%E7%BD%B2%E5%92%8C%E9%87%87%E9%9B%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="C.c">
+      <meta itemprop="description" content="A Blog">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Me">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+           elasticsearch部署和采集		
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-01-15 11:23:15" itemprop="dateCreated datePublished" datetime="2019-01-15T11:23:15+08:00">2019-01-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-07-06 19:16:16" itemprop="dateModified" datetime="2021-07-06T19:16:16+08:00">2021-07-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/elasticsearch/" itemprop="url" rel="index">
+                    <span itemprop="name">elasticsearch</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>部署分为几个部分<br>1.Elasticsearch<br>2.Logstash<br>3.Kibanna<br>4.Filebeats(可选)<br>注：本文使用版本为5.3.3，以上内容均为此版本，<a target="_blank" rel="noopener" href="https://www.elastic.co/">官网传送门</a></p>
+<h2 id="elasticsearch安装"><a href="#elasticsearch安装" class="headerlink" title="elasticsearch安装"></a>elasticsearch安装</h2><p>安装之前，先建一个linux账号，因为elasticsearch不允许用root账号启动</p>
+<p>创建用户组</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">groupadd es</span><br></pre></td></tr></table></figure>
+<p>创建用户并分配到用户组</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">useradd es -g es</span><br></pre></td></tr></table></figure>
+<p>以下elasticsearch简称es<br>将elasticsearch的文件夹授权给新建的用户es(需要root权限)</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chown -R es:es elasticsearch-5.5.3</span><br></pre></td></tr></table></figure>
+<p>启动(-d表示后台运行。第一次启动建议不加-d，没问题之后加上-d)</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./bin/elasticsearch -d</span><br></pre></td></tr></table></figure>
+<p>可能遇到的问题<br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/xxoome/p/6663993.html">https://www.cnblogs.com/xxoome/p/6663993.html</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/sunsky303/p/9676646.html">https://www.cnblogs.com/sunsky303/p/9676646.html</a><br>验证启动<br>方式一：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">//es绑定到本地（默认）的时候使用</span><br><span class="line">curl -XGET <span class="string">&#x27;http://localhost:9200&#x27;</span></span><br></pre></td></tr></table></figure>
+<p>方式二：<br>浏览器访问 [服务器ip]:9200<br>返回如下信息</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;name&quot;</span> : <span class="string">&quot;node-1&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;cluster_name&quot;</span> : <span class="string">&quot;elasticsearch&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;cluster_uuid&quot;</span> : <span class="string">&quot;riaWrZzvSJOzk3no7gJb8w&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;version&quot;</span> : &#123;</span><br><span class="line">    <span class="attr">&quot;number&quot;</span> : <span class="string">&quot;5.5.3&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;build_hash&quot;</span> : <span class="string">&quot;9305a5e&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;build_date&quot;</span> : <span class="string">&quot;2017-09-07T15:56:59.599Z&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;build_snapshot&quot;</span> : <span class="literal">false</span>,</span><br><span class="line">    <span class="attr">&quot;lucene_version&quot;</span> : <span class="string">&quot;6.6.0&quot;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">&quot;tagline&quot;</span> : <span class="string">&quot;You Know, for Search&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="kibana安装"><a href="#kibana安装" class="headerlink" title="kibana安装"></a>kibana安装</h2><p>编辑 config/kibana.yml<br>修改server.host为服务器ip<br>填上能够访问的es的地址elasticsearch.url（默认为本地）<br>将kibana所在文件夹授权给es(需要root权限)</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chown -R es:es [kibana文件夹]</span><br></pre></td></tr></table></figure>
+<p>后台启动</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nohup ./bin/kibana &amp;</span><br></pre></td></tr></table></figure>
+<p>验证安装<br>访问 [服务器ip]:5601</p>
+<h2 id="logstash安装"><a href="#logstash安装" class="headerlink" title="logstash安装"></a>logstash安装</h2><p>解压之后<br>在config目录下新建log.conf<br>将logstash所在文件夹授权给es(需要root权限)</p>
+<figure class="highlight x86asm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chown -R <span class="built_in">es</span>:<span class="built_in">es</span> [logstash文件夹]</span><br></pre></td></tr></table></figure>
+<h3 id="配置数据库采集"><a href="#配置数据库采集" class="headerlink" title="配置数据库采集"></a>配置数据库采集</h3><p>最好是在数据库中新建一个只有要采集数据表的查看权限的用户来读取日志<br>CREATE USER ‘es’@’localhost’ IDENTIFIED BY ‘密码’;<br>GRANT SELECT ON [数据库名].[日志表名称] to ‘es’@’localhost’;<br>将mysql的连接jar包放到logstash的根目录下<br>这里以mysql-connector-java-5.1.13-bin.jar为例<br>编辑log.conf，加入如下内容</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">input</span> &#123;</span><br><span class="line"><span class="comment">#filebeat采集入口</span></span><br><span class="line">  <span class="string">beats</span> &#123;</span><br><span class="line">    <span class="string">port</span> <span class="string">=&gt;</span> <span class="number">5000</span></span><br><span class="line">  &#125;</span><br><span class="line"> <span class="string">jdbc</span> &#123;</span><br><span class="line">      <span class="comment">#clean_run =&gt; true #表示是否重新采集</span></span><br><span class="line">      <span class="string">jdbc_driver_library</span> <span class="string">=&gt;</span> <span class="string">&quot;mysql-connector-java-5.1.13-bin.jar&quot;</span></span><br><span class="line">      <span class="string">jdbc_driver_class</span> <span class="string">=&gt;</span> <span class="string">&quot;com.mysql.jdbc.Driver&quot;</span></span><br><span class="line">      <span class="string">jdbc_user</span> <span class="string">=&gt;</span> <span class="string">&quot;es&quot;</span></span><br><span class="line">      <span class="string">jdbc_password=&gt;</span> <span class="string">&quot;密码&quot;</span></span><br><span class="line">      <span class="string">jdbc_connection_string</span> <span class="string">=&gt;</span> <span class="string">&quot;jdbc:mysql://localhost:3306/数据库?useUnicode=true&amp;characterEncoding=UTF-8&amp;zeroDateTimeBehavior=convertToNull&quot;</span></span><br><span class="line">      <span class="string">jdbc_validate_connection</span> <span class="string">=&gt;</span> <span class="literal">true</span></span><br><span class="line">      <span class="string">schedule</span> <span class="string">=&gt;</span> <span class="string">&quot;* * * * *&quot;</span></span><br><span class="line">      <span class="string">use_column_value</span> <span class="string">=&gt;</span> <span class="literal">true</span></span><br><span class="line">      <span class="string">tracking_column</span> <span class="string">=&gt;</span> <span class="string">&quot;id&quot;</span></span><br><span class="line">      <span class="string">statement</span> <span class="string">=&gt;</span> <span class="string">&quot;要执行的sql&quot;</span></span><br><span class="line">      <span class="string">jdbc_paging_enabled</span> <span class="string">=&gt;</span> <span class="literal">true</span></span><br><span class="line">      <span class="string">jdbc_page_size</span> <span class="string">=&gt;</span> <span class="number">5000</span></span><br><span class="line">      <span class="string">type</span> <span class="string">=&gt;</span> <span class="string">&quot;es中的type&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="string">output&#123;</span></span><br><span class="line"><span class="string">elasticsearch</span> &#123;</span><br><span class="line">      <span class="string">hosts</span> <span class="string">=&gt;</span> <span class="string">&quot;[es的地址]&quot;</span></span><br><span class="line">      <span class="string">index</span> <span class="string">=&gt;</span> <span class="string">&quot;es中的index&quot;</span></span><br><span class="line">	  <span class="comment">#将id作为es中的id</span></span><br><span class="line">      <span class="string">document_id</span> <span class="string">=&gt;</span> <span class="string">&quot;<span class="template-variable">%&#123;id&#125;</span>&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="string">stdout</span> &#123;</span><br><span class="line">      <span class="string">codec</span> <span class="string">=&gt;</span> <span class="string">json_lines</span></span><br><span class="line">    &#125;</span><br><span class="line"><span class="string">&#125;</span></span><br></pre></td></tr></table></figure>
+<p><code>:sql_last_value</code>表示字段上次执行的值，可用tracking_column配置，可以用在要执行的sql中<br>eg:</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * <span class="keyword">from</span> table_user <span class="keyword">where</span> <span class="built_in">id</span> &gt; :sql_last_value</span><br></pre></td></tr></table></figure>
+<p>后台启动logstash</p>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nohup bin/logstash -f config/<span class="built_in">log</span>.conf <span class="meta">&amp;</span></span><br></pre></td></tr></table></figure>
+<p>jdbc部分的配置可以查看<a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/logstash/5.3/input-plugins.html">input插件</a>中的jdbc部分<br><a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/logstash/5.3/output-plugins.html">output插件</a><br><a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/logstash/5.3/filter-plugins.html">filter插件</a></p>
+<h3 id="采集Tomcat日志（例子）"><a href="#采集Tomcat日志（例子）" class="headerlink" title="采集Tomcat日志（例子）"></a>采集Tomcat日志（例子）</h3><p>编辑logstash配置文件在input下加入</p>
+<figure class="highlight puppet"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">beats</span> &#123;</span><br><span class="line">    <span class="attr">port</span> =&gt; <span class="number">5000</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>和Input同级加入</p>
+<figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">filter</span> &#123;</span><br><span class="line">  #<span class="type">Only</span> matched <span class="class"><span class="keyword">data</span> are send to output.</span></span><br><span class="line">  <span class="keyword">if</span> [<span class="class"><span class="keyword">type</span>] == &quot;log&quot;&#123;</span></span><br><span class="line"><span class="class">    <span class="title">grok</span> &#123;</span></span><br><span class="line"><span class="class">      <span class="title">match</span> =&gt; &#123; &quot;<span class="title">message</span>&quot; =&gt; &quot;%&#123;<span class="type">TIMESTAMP_ISO8601</span>:<span class="title">time</span>&#125;\s\[%&#123;<span class="type">LOGLEVEL</span>:<span class="title">level</span>&#125;\]\[(?&lt;<span class="title">threadName</span>&gt;([\<span class="title">s</span>\<span class="type">S</span>]*))\]\s%&#123;<span class="type">NOTSPACE</span>:<span class="title">loggerName</span>&#125;\s(?&lt;<span class="title">info</span>&gt;([\<span class="title">s</span>\<span class="type">S</span>]*))&quot;&#125;</span></span><br><span class="line">    &#125;</span><br><span class="line">    date &#123;</span><br><span class="line">      match =&gt; [ <span class="string">&quot;time&quot;</span>, <span class="string">&quot;yyyy-MM-dd HH:mm:ss.SSS&quot;</span> ]</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Output修改为</p>
+<figure class="highlight puppet"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">if [type] == <span class="string">&quot;log&quot;</span>&#123;</span><br><span class="line">    <span class="keyword">elasticsearch</span> &#123;</span><br><span class="line">      <span class="attr">action</span> =&gt; <span class="string">&quot;index&quot;</span>          <span class="comment">#The operation on ES</span></span><br><span class="line">      <span class="attr">hosts</span>  =&gt; <span class="string">&quot;[es的地址]&quot;</span>   <span class="comment">#ElasticSearch host, can be array.</span></span><br><span class="line">      <span class="attr">index</span>  =&gt; <span class="string">&quot;systemlog&quot;</span>         <span class="comment">#The index to write data to.</span></span><br><span class="line">&#125;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">   elasticsearch &#123;</span><br><span class="line">      <span class="attr">hosts</span> =&gt; <span class="string">&quot;[es的地址]&quot;</span></span><br><span class="line">      <span class="attr">index</span> =&gt; <span class="string">&quot;数据库采集的index&quot;</span></span><br><span class="line">      <span class="attr">document_id</span> =&gt; <span class="string">&quot;%&#123;id&#125;&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">stdout</span> &#123;</span><br><span class="line">      <span class="attr">codec</span> =&gt; json_lines</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<h4 id="filebeat安装"><a href="#filebeat安装" class="headerlink" title="filebeat安装"></a>filebeat安装</h4><p>备份原有fielebeat.yml<br>新建filebeat.yml<br>写入</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">filebeat:</span></span><br><span class="line">  <span class="attr">prospectors:</span></span><br><span class="line">    <span class="bullet">-</span></span><br><span class="line">      <span class="attr">paths:</span></span><br><span class="line">        <span class="bullet">-</span> [<span class="string">tomcat的catalina.out的绝对路径</span>]</span><br><span class="line">      <span class="attr">input_type:</span> <span class="string">log</span></span><br><span class="line">      <span class="attr">encoding:</span> <span class="string">utf-8</span></span><br><span class="line">      <span class="attr">multiline:</span></span><br><span class="line">       <span class="comment">#pattern: &#x27;^[[:space:]]+(at|\.&#123;3&#125;)\b|^Caused by:&#x27;</span></span><br><span class="line">        <span class="attr">pattern:</span> <span class="string">&#x27;^[0-9]&#123;4&#125;-[0-9]&#123;2&#125;-[0-9]&#123;2&#125;&#x27;</span></span><br><span class="line">        <span class="attr">negate:</span> <span class="literal">true</span></span><br><span class="line">        <span class="attr">match:</span> <span class="string">after</span></span><br><span class="line">      <span class="attr">processors:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">drop_fields:</span></span><br><span class="line">            <span class="attr">fields:</span> [<span class="string">&quot;source&quot;</span>,<span class="string">&quot;beat&quot;</span>,<span class="string">&quot;host&quot;</span>]</span><br><span class="line"><span class="attr">output:</span></span><br><span class="line">  <span class="attr">logstash:</span></span><br><span class="line">    <span class="attr">hosts:</span> [<span class="string">&quot;[logstash地址]:[logstash中配置的filebeat的端口号]&quot;</span>]</span><br><span class="line"><span class="attr">setup.kibana:</span></span><br><span class="line">  <span class="attr">host:</span> [<span class="string">&quot;kibanna地址加端口号&quot;</span>]</span><br></pre></td></tr></table></figure>
+<p>后台启动filebeat</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nohup ./filebeat -c ./filebeat.yml &amp;</span><br></pre></td></tr></table></figure>
+<h4 id="filebeat执行的过程"><a href="#filebeat执行的过程" class="headerlink" title="filebeat执行的过程"></a>filebeat执行的过程</h4><p>采集日志（通过multiline区分多行和单行）-》发往logstash-》logstash通过filter对日志信息进行拆解（通过grok表达式）为多个字段-》通过output插入es</p>
+<h4 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h4><p>grok调试网站<br><a target="_blank" rel="noopener" href="http://grokdebug.herokuapp.com/">http://grokdebug.herokuapp.com/</a>(科学上网)<br><a target="_blank" rel="noopener" href="http://grok.qiexun.net/">http://grok.qiexun.net/</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/es/" rel="tag"># es</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/12/26/docker%E5%AE%89%E8%A3%85%EF%BC%88centos%EF%BC%89/" rel="prev" title=" docker安装（centos）		">
+      <i class="fa fa-chevron-left"></i>  docker安装（centos）		
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/02/26/es2015es6/" rel="next" title=" ES2015(ES6)		">
+       ES2015(ES6)		 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#elasticsearch%E5%AE%89%E8%A3%85"><span class="nav-number">1.</span> <span class="nav-text">elasticsearch安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#kibana%E5%AE%89%E8%A3%85"><span class="nav-number">2.</span> <span class="nav-text">kibana安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#logstash%E5%AE%89%E8%A3%85"><span class="nav-number">3.</span> <span class="nav-text">logstash安装</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E6%95%B0%E6%8D%AE%E5%BA%93%E9%87%87%E9%9B%86"><span class="nav-number">3.1.</span> <span class="nav-text">配置数据库采集</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%87%E9%9B%86Tomcat%E6%97%A5%E5%BF%97%EF%BC%88%E4%BE%8B%E5%AD%90%EF%BC%89"><span class="nav-number">3.2.</span> <span class="nav-text">采集Tomcat日志（例子）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#filebeat%E5%AE%89%E8%A3%85"><span class="nav-number">3.2.1.</span> <span class="nav-text">filebeat安装</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#filebeat%E6%89%A7%E8%A1%8C%E7%9A%84%E8%BF%87%E7%A8%8B"><span class="nav-number">3.2.2.</span> <span class="nav-text">filebeat执行的过程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%99%84%E5%BD%95"><span class="nav-number">3.2.3.</span> <span class="nav-text">附录</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">C.c</p>
+  <div class="site-description" itemprop="description">A Blog</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/CaseCy" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;CaseCy" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://liquidcat.cc/" title="Blog → https:&#x2F;&#x2F;liquidcat.cc" rel="noopener" target="_blank"><i class="fa fa-fw fa-gratipay"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://gitee.com/cononyc" title="Gitee → https:&#x2F;&#x2F;gitee.com&#x2F;cononyc" rel="noopener" target="_blank"><i class="fa fa-fw fa-user-circle"></i></a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+  <div class="beian"><a href="http://beian.miit.gov.cn/" rel="noopener" target="_blank">蜀ICP备2021018575号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">C.c</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

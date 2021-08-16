@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://cononyc.gitee.io').hostname,
+    root: '/',
+    scheme: 'Mist',
+    version: '7.7.0',
+    exturl: false,
+    sidebar: {"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":false,"style":"flat"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="默认以spring cloud项目来描述使用方式 使用的版本  spring-boot:2.1.x spring-cloud:Greenwich.RELEASE spring-cloud-alibaba:2.1.x java:1.8+  Nacos服务端服务端相当于euraka和spring-cloud-config的集合，Nacos的web页面，服务注册，和配置全部在服务端上 注册中心注册中心和">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nacos探索和实践">
+<meta property="og:url" content="https://cononyc.gitee.io/2020/12/04/nacos/index.html">
+<meta property="og:site_name" content="Me">
+<meta property="og:description" content="默认以spring cloud项目来描述使用方式 使用的版本  spring-boot:2.1.x spring-cloud:Greenwich.RELEASE spring-cloud-alibaba:2.1.x java:1.8+  Nacos服务端服务端相当于euraka和spring-cloud-config的集合，Nacos的web页面，服务注册，和配置全部在服务端上 注册中心注册中心和">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cononyc.gitee.io/static/%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83.png">
+<meta property="og:image" content="https://cononyc.gitee.io/static/%E5%91%BD%E5%90%8D%E7%A9%BA%E9%97%B4.png">
+<meta property="og:image" content="https://cononyc.gitee.io/static/%E7%89%88%E6%9C%AC%E7%AE%A1%E7%90%86.png">
+<meta property="og:image" content="https://cononyc.gitee.io/static/%E7%99%BB%E5%BD%95%E9%A1%B5%E9%9D%A2.png">
+<meta property="og:image" content="https://cononyc.gitee.io/static/%E5%AF%BC%E5%85%A5%E9%85%8D%E7%BD%AE.png">
+<meta property="og:image" content="https://cononyc.gitee.io/static/%E4%B8%8A%E4%BC%A0%E6%96%87%E4%BB%B6.png">
+<meta property="article:published_time" content="2020-12-04T01:05:38.000Z">
+<meta property="article:modified_time" content="2021-07-06T11:16:16.786Z">
+<meta property="article:author" content="C.c">
+<meta property="article:tag" content="springcloud">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cononyc.gitee.io/static/%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83.png">
+
+<link rel="canonical" href="https://cononyc.gitee.io/2020/12/04/nacos/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>Nacos探索和实践 | Me</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Me</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://cononyc.gitee.io/2020/12/04/nacos/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="C.c">
+      <meta itemprop="description" content="A Blog">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Me">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Nacos探索和实践
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-12-04 09:05:38" itemprop="dateCreated datePublished" datetime="2020-12-04T09:05:38+08:00">2020-12-04</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-07-06 19:16:16" itemprop="dateModified" datetime="2021-07-06T19:16:16+08:00">2021-07-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/nacos/" itemprop="url" rel="index">
+                    <span itemprop="name">nacos</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>默认以spring cloud项目来描述使用方式</p>
+<p>使用的版本</p>
+<ul>
+<li>spring-boot:2.1.x</li>
+<li>spring-cloud:Greenwich.RELEASE</li>
+<li>spring-cloud-alibaba:2.1.x</li>
+<li>java:1.8+</li>
+</ul>
+<h2 id="Nacos服务端"><a href="#Nacos服务端" class="headerlink" title="Nacos服务端"></a>Nacos服务端</h2><p>服务端相当于euraka和spring-cloud-config的集合，Nacos的web页面，服务注册，和配置全部在服务端上</p>
+<h2 id="注册中心"><a href="#注册中心" class="headerlink" title="注册中心"></a>注册中心</h2><p>注册中心和eureka差不多，只是Nacos提供了不同的页面，不过可以在服务详情里通过页面控制服务的上下线，这点还是比较方便，和配置中心一样，也可以通过Group+Namespace来管理服务，Nacos的服务的调用支持Feign和Dubbo</p>
+<p><img src="/static/%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83.png" alt=""></p>
+<h2 id="配置中心"><a href="#配置中心" class="headerlink" title="配置中心"></a>配置中心</h2><p>Nacos支持spring、spring-boot、spring-cloud的配置管理。</p>
+<p>Nacos的服务配置内容必须写在bootstrap.properties/yml中，Nacos默认会去读取以服务名称开头的配置，这里的配置的唯一id就是dataId，其组成如下：</p>
+<blockquote>
+<p>在 Nacos Spring Cloud 中，<code>dataId</code> 的完整格式如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$&#123;prefix&#125;-$&#123;spring.profiles.active&#125;.$&#123;file-extension&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>prefix</code> 默认为 <code>spring.application.name</code> 的值，也可以通过配置项 <code>spring.cloud.nacos.config.prefix</code>来配置。</li>
+<li><code>spring.profiles.active</code> 即为当前环境对应的 profile，详情可以参考 <a target="_blank" rel="noopener" href="https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-profiles.html#boot-features-profiles">Spring Boot文档</a>。 <strong>注意：当 <code>spring.profiles.active</code> 为空时，对应的连接符 <code>-</code> 也将不存在，dataId 的拼接格式变成 <code>$&#123;prefix&#125;.$&#123;file-extension&#125;</code></strong></li>
+<li><code>file-exetension</code> 为配置内容的数据格式，可以通过配置项 <code>spring.cloud.nacos.config.file-extension</code> 来配置。目前只支持 <code>properties</code> 和 <code>yaml</code> 类型。</li>
+</ul>
+</blockquote>
+<p>除了服务名称开头的配置文件，Nacos还支持通过<code>spring.cloud.nacos.config.shared-configs[n].data-id</code>和<code>spring.cloud.nacos.config.extension-configs[n].data-id</code>的方式添加额外的配置，其加载的顺序如下</p>
+<h3 id="配置读取的顺序"><a href="#配置读取的顺序" class="headerlink" title="配置读取的顺序"></a>配置读取的顺序</h3><blockquote>
+<p>Spring Cloud Alibaba Nacos Config 目前提供了三种配置能力从 Nacos 拉取相关的配置。</p>
+<ul>
+<li>A: 通过 <code>spring.cloud.nacos.config.shared-configs[n].data-id</code> 支持多个共享 Data Id 的配置</li>
+<li>B: 通过 <code>spring.cloud.nacos.config.extension-configs[n].data-id</code> 的方式支持多个扩展 Data Id 的配置</li>
+<li>C: 通过内部相关规则(应用名、应用名+ Profile )自动生成相关的 Data Id 配置</li>
+</ul>
+<p>当三种方式共同使用时，他们的一个优先级关系是:A &lt; B &lt; C</p>
+</blockquote>
+<p>可以参看：<a target="_blank" rel="noopener" href="https://github.com/alibaba/spring-cloud-alibaba/wiki/Nacos-config">https://github.com/alibaba/spring-cloud-alibaba/wiki/Nacos-config</a></p>
+<p>关于spring-boot的配置加载顺序可以参照<a target="_blank" rel="noopener" href="https://docs.spring.io/spring-boot/docs/2.1.18.RELEASE/reference/html/boot-features-external-config.html">Externalized Configuration</a>，关于为什么写在bootstrap.properties/yml中可以参照<a target="_blank" rel="noopener" href="https://cloud.spring.io/spring-cloud-static/Greenwich.SR1/single/spring-cloud.html#_the_bootstrap_application_context">application-context</a></p>
+<h3 id="配置管理"><a href="#配置管理" class="headerlink" title="配置管理"></a>配置管理</h3><p>Nacos使用Group和Namespace来管理配置文件，每个配置文件都有一个Group和一个Namespace属性，包含关系是Group在Namespace下，而配置文件在Group下，可以使用这两个属性来区分不同的环境和场景</p>
+<p><img src="/static/%E5%91%BD%E5%90%8D%E7%A9%BA%E9%97%B4.png" alt=""></p>
+<h2 id="搭建Nacos项目"><a href="#搭建Nacos项目" class="headerlink" title="搭建Nacos项目"></a>搭建Nacos项目</h2><p>引入spring-cloud-alibaba版本依赖</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependencyManagement</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-alibaba-dependencies<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;spring.cloud.alibaba.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">type</span>&gt;</span>pom<span class="tag">&lt;/<span class="name">type</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">scope</span>&gt;</span>import<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependencyManagement</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>版本依据spring-boot的版本而定，依赖版本可以查看<a target="_blank" rel="noopener" href="https://github.com/alibaba/spring-cloud-alibaba/releases">发布版本</a>，如下图</p>
+<p><img src="/static/%E7%89%88%E6%9C%AC%E7%AE%A1%E7%90%86.png" alt="版本管理.png"></p>
+<p>也可以参看这个<a target="_blank" rel="noopener" href="https://github.com/alibaba/spring-cloud-alibaba/wiki/%E7%89%88%E6%9C%AC%E8%AF%B4%E6%98%8E">https://github.com/alibaba/spring-cloud-alibaba/wiki/%E7%89%88%E6%9C%AC%E8%AF%B4%E6%98%8E</a></p>
+<h3 id="服务端使用"><a href="#服务端使用" class="headerlink" title="服务端使用"></a>服务端使用</h3><p>参看Nacos<a target="_blank" rel="noopener" href="https://nacos.io/zh-cn/docs/quick-start.html">官方</a></p>
+<p>目前项目是直接下载的Nacos<a target="_blank" rel="noopener" href="https://github.com/alibaba/nacos/releases">稳定版本</a>的压缩包</p>
+<p>并使用(Linux)</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sh bin/startup.sh -m standalone</span><br></pre></td></tr></table></figure>
+
+<p>单机启动，如果不加<code>-m standalone</code>的话默认是集群模式</p>
+<p>启动配置文件<code>conf/application.properties</code>,可以在里面制定数据库，将配置文件存放到数据库中，使用数据库需要先初始化数据库，数据库脚本<code>conf/nacos-mysql.sql</code></p>
+<p>启动后访问<a target="_blank" rel="noopener" href="http://ip:8848/nacos">http://ip:8848/nacos</a>可以看到Nacos登录页面，默认登录账户名密码 nacos nacos</p>
+<p><img src="/static/%E7%99%BB%E5%BD%95%E9%A1%B5%E9%9D%A2.png" alt=""></p>
+<h3 id="注册中心使用"><a href="#注册中心使用" class="headerlink" title="注册中心使用"></a>注册中心使用</h3><p>引入依赖</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-starter-alibaba-nacos-discovery<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>在bootstrap.yml或者bootstrap.properties中加入注册中心设置</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Nacos的地址</span></span><br><span class="line"><span class="meta">spring.cloud.nacos.discovery.server-addr</span>=<span class="string">Nacos-server地址</span></span><br><span class="line"><span class="comment"># 命名空间，可不填，默认public</span></span><br><span class="line"><span class="meta">spring.cloud.nacos.discovery.namespace</span>=<span class="string">NACOS命名空间</span></span><br></pre></td></tr></table></figure>
+
+<p>如果要使用Feign，和以前euraka的使用方法一致，Dubbo可以参看<a target="_blank" rel="noopener" href="https://nacos.io/zh-cn/docs/use-nacos-with-dubbo.html">https://nacos.io/zh-cn/docs/use-nacos-with-dubbo.html</a></p>
+<h3 id="配置中心使用"><a href="#配置中心使用" class="headerlink" title="配置中心使用"></a>配置中心使用</h3><p>引入依赖</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-starter-alibaba-nacos-config<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>在bootstrap.yml或者bootstrap.properties中加入配置中心设置</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">spring.cloud.nacos.config.server-addr</span>=<span class="string">Nacos-server地址</span></span><br><span class="line"><span class="comment"># 这个是必须要的</span></span><br><span class="line"><span class="meta">spring.application.name</span>=<span class="string">example</span></span><br></pre></td></tr></table></figure>
+
+<p>如果不需要额外配置的话就使用这个就可以了</p>
+<p>如果需要添加额外的配置，这里只列举一些项目中用的比较多的配置</p>
+<p>读取配置的顺序可以参考<a href="#配置中心"></a></p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 文件后缀，这个配置只影响默认的配置（即服务名称+环境+文件后缀的形式）</span></span><br><span class="line"><span class="meta">spring.cloud.nacos.config.file-extension</span>=<span class="string">properties</span></span><br><span class="line"><span class="comment"># 文件分组，这个配置只影响默认的配置（即服务名称+环境+文件后缀的形式）</span></span><br><span class="line"><span class="meta">spring.cloud.nacos.config.group</span>=<span class="string">APPLICATION_GROUP</span></span><br><span class="line"><span class="comment"># 共享的配置（DEFAULT_GROUP）</span></span><br><span class="line"><span class="meta">spring.cloud.nacos.config.shared-configs</span>=<span class="string">application.properties</span></span><br><span class="line"><span class="comment"># NACOS的命名空间</span></span><br><span class="line"><span class="meta">spring.cloud.nacos.config.namespace</span>=<span class="string">NACOS的命名空间</span></span><br><span class="line"><span class="comment"># 额外配置</span></span><br><span class="line"><span class="meta">spring.cloud.nacos.config.extension-configs[0].data-id</span>=<span class="string">xxxxx.properties</span></span><br><span class="line"><span class="comment"># 是否自动更新，默认是false，可以不写</span></span><br><span class="line"><span class="meta">spring.cloud.nacos.config.extension-configs[0].refresh</span>=<span class="string">true</span></span><br><span class="line"><span class="comment"># 分组（默认是DEFAULT_GROUP，可以不写</span></span><br><span class="line"><span class="meta">spring.cloud.nacos.config.extension-configs[0].group</span>=<span class="string">DEFAULT_GROUP</span></span><br><span class="line"><span class="meta">spring.cloud.nacos.config.extension-configs[1].data-id</span>=<span class="string">xxx.properties</span></span><br><span class="line"><span class="meta">spring.cloud.nacos.config.extension-configs[1].refresh</span>=<span class="string">true</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="动态刷新"><a href="#动态刷新" class="headerlink" title="动态刷新"></a>动态刷新</h4><p>在项目（Spring cloud项目）中使用<code>@RefeshScope</code>注解就可以实现动态刷新</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@RequestMapping(&quot;/config&quot;)</span></span><br><span class="line"><span class="meta">@RefreshScope</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ConfigController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value(&quot;$&#123;useLocalCache:false&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> useLocalCache;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping(&quot;/get&quot;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">get</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> useLocalCache;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里在nacos上修改了useLocalCache为true之后，然后调用接口，可以看到接口返回的值为true</p>
+<p>使用该注解可以引入依赖</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-context<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="批量导入配置"><a href="#批量导入配置" class="headerlink" title="批量导入配置"></a>批量导入配置</h4><p>Nacos支持批量导入配置，目前我所知有两种方式</p>
+<ul>
+<li>直接将Nacos的数据库导出sql，然后再导入另外的数据库</li>
+<li>在页面上使用导入配置功能</li>
+</ul>
+<p>这里只介绍第二种方式，选择配置管理-&gt;配置列表，要导入的命名空间</p>
+<p><img src="/static/%E5%AF%BC%E5%85%A5%E9%85%8D%E7%BD%AE.png" alt=""></p>
+<p><img src="/static/%E4%B8%8A%E4%BC%A0%E6%96%87%E4%BB%B6.png" alt=""></p>
+<p>选择上传文件，Nacos目前好像只支持zip压缩包</p>
+<p>配置要放在一个文件夹中，文件夹的名称为导入后的Group名称，所以导入的结构</p>
+<p>└─Group名称<br>    └─xxx.properties<br>    └─xxx.yml</p>
+<p>弄好之后压缩为zip文件，然后导入即可</p>
+<h2 id="项目应用说明"><a href="#项目应用说明" class="headerlink" title="项目应用说明"></a>项目应用说明</h2><p>目前在项目中使用Nacos作为配置中心和注册中心，本地只留了一个bootstrap.properties文件，其他配置全部使用nacos管理，使用Nacos的命令空间来管理不同环境的配置，如果目前项目使用check和pro来表示命名空间，使用group来区分公共文件和服务配置文件，如APPLICATION_GROUP和DEFAULT_GROUP，注册中心目前就是简单的注册功能，Nacos目前使用的是单机+mysql</p>
+<h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><p><a target="_blank" rel="noopener" href="https://github.com/alibaba/nacos">Nacos GitHub</a></p>
+<p><a target="_blank" rel="noopener" href="https://nacos.io/zh-cn/docs/what-is-nacos.html">Nacos文档</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/alibaba/spring-cloud-alibaba">Spring Cloud Alibaba GitHub</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/springcloud/" rel="tag"># springcloud</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/02/21/%E6%95%B0%E6%8D%AE%E5%BA%93%E5%A6%82%E4%BD%95%E5%AD%98%E5%82%A8%E6%97%B6%E9%97%B4/" rel="prev" title="数据库如何存储时间">
+      <i class="fa fa-chevron-left"></i> 数据库如何存储时间
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Nacos%E6%9C%8D%E5%8A%A1%E7%AB%AF"><span class="nav-number">1.</span> <span class="nav-text">Nacos服务端</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83"><span class="nav-number">2.</span> <span class="nav-text">注册中心</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83"><span class="nav-number">3.</span> <span class="nav-text">配置中心</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E8%AF%BB%E5%8F%96%E7%9A%84%E9%A1%BA%E5%BA%8F"><span class="nav-number">3.1.</span> <span class="nav-text">配置读取的顺序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E7%AE%A1%E7%90%86"><span class="nav-number">3.2.</span> <span class="nav-text">配置管理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%90%AD%E5%BB%BANacos%E9%A1%B9%E7%9B%AE"><span class="nav-number">4.</span> <span class="nav-text">搭建Nacos项目</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E7%AB%AF%E4%BD%BF%E7%94%A8"><span class="nav-number">4.1.</span> <span class="nav-text">服务端使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83%E4%BD%BF%E7%94%A8"><span class="nav-number">4.2.</span> <span class="nav-text">注册中心使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83%E4%BD%BF%E7%94%A8"><span class="nav-number">4.3.</span> <span class="nav-text">配置中心使用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E5%88%B7%E6%96%B0"><span class="nav-number">4.3.1.</span> <span class="nav-text">动态刷新</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%89%B9%E9%87%8F%E5%AF%BC%E5%85%A5%E9%85%8D%E7%BD%AE"><span class="nav-number">4.3.2.</span> <span class="nav-text">批量导入配置</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A1%B9%E7%9B%AE%E5%BA%94%E7%94%A8%E8%AF%B4%E6%98%8E"><span class="nav-number">5.</span> <span class="nav-text">项目应用说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%99%84%E5%BD%95"><span class="nav-number">6.</span> <span class="nav-text">附录</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">C.c</p>
+  <div class="site-description" itemprop="description">A Blog</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/CaseCy" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;CaseCy" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://liquidcat.cc/" title="Blog → https:&#x2F;&#x2F;liquidcat.cc" rel="noopener" target="_blank"><i class="fa fa-fw fa-gratipay"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://gitee.com/cononyc" title="Gitee → https:&#x2F;&#x2F;gitee.com&#x2F;cononyc" rel="noopener" target="_blank"><i class="fa fa-fw fa-user-circle"></i></a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+  <div class="beian"><a href="http://beian.miit.gov.cn/" rel="noopener" target="_blank">蜀ICP备2021018575号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">C.c</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

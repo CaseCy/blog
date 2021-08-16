@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://cononyc.gitee.io').hostname,
+    root: '/',
+    scheme: 'Mist',
+    version: '7.7.0',
+    exturl: false,
+    sidebar: {"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":false,"style":"flat"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="概念：Web service是一个平台独立的，低耦合的，自包含的、基于可编程的web的应用程序，可使用开放的XML（标准通用标记语言下的一个子集）标准来描述、发布、发现、协调和配置这些应用程序，用于开发分布式的互操作的应用程序。webservice用到的技术主要有XML+XSD，SOAP和WSDL，XML Schema(XSD)定义了一套标准的数据类型，并给出了一种语言来扩展这套数据类型完整的流程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WebService">
+<meta property="og:url" content="https://cononyc.gitee.io/2018/10/19/WebService/index.html">
+<meta property="og:site_name" content="Me">
+<meta property="og:description" content="概念：Web service是一个平台独立的，低耦合的，自包含的、基于可编程的web的应用程序，可使用开放的XML（标准通用标记语言下的一个子集）标准来描述、发布、发现、协调和配置这些应用程序，用于开发分布式的互操作的应用程序。webservice用到的技术主要有XML+XSD，SOAP和WSDL，XML Schema(XSD)定义了一套标准的数据类型，并给出了一种语言来扩展这套数据类型完整的流程">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://imageu.oss-cn-shenzhen.aliyuncs.com/noteimage/webservice%E5%8E%9F%E7%90%86.png">
+<meta property="og:image" content="http://imageu.oss-cn-shenzhen.aliyuncs.com/noteimage/wsdl.png">
+<meta property="og:image" content="http://imageu.oss-cn-shenzhen.aliyuncs.com/noteimage/axis%E5%8F%91%E5%B8%83%E6%88%90%E5%8A%9F.png">
+<meta property="og:image" content="http://imageu.oss-cn-shenzhen.aliyuncs.com/webservice-idea/servernew1.png">
+<meta property="og:image" content="http://imageu.oss-cn-shenzhen.aliyuncs.com/webservice-idea/servernew2.png">
+<meta property="og:image" content="http://imageu.oss-cn-shenzhen.aliyuncs.com/webservice-idea/servernew3.png">
+<meta property="og:image" content="http://imageu.oss-cn-shenzhen.aliyuncs.com/webservice-idea/serverlocation1.png">
+<meta property="og:image" content="http://imageu.oss-cn-shenzhen.aliyuncs.com/webservice-idea/serverlocation2.png">
+<meta property="og:image" content="http://imageu.oss-cn-shenzhen.aliyuncs.com/webservice-idea/clientnew1.png">
+<meta property="og:image" content="http://imageu.oss-cn-shenzhen.aliyuncs.com/webservice-idea/clientnew2.png">
+<meta property="og:image" content="http://imageu.oss-cn-shenzhen.aliyuncs.com/webservice-idea/clientnew3.png">
+<meta property="og:image" content="http://imageu.oss-cn-shenzhen.aliyuncs.com/webservice-idea/clientnew4.png">
+<meta property="og:image" content="http://imageu.oss-cn-shenzhen.aliyuncs.com/webservice-idea/clientnew5.png">
+<meta property="og:image" content="http://imageu.oss-cn-shenzhen.aliyuncs.com/webservice-idea/clientlocation1.png">
+<meta property="og:image" content="http://imageu.oss-cn-shenzhen.aliyuncs.com/webservice-idea/clientlocation2.png">
+<meta property="og:image" content="http://imageu.oss-cn-shenzhen.aliyuncs.com/webservice-idea/clientlocation3.png">
+<meta property="article:published_time" content="2018-10-19T01:42:07.000Z">
+<meta property="article:modified_time" content="2021-07-06T11:16:16.777Z">
+<meta property="article:author" content="C.c">
+<meta property="article:tag" content="杂">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://imageu.oss-cn-shenzhen.aliyuncs.com/noteimage/webservice%E5%8E%9F%E7%90%86.png">
+
+<link rel="canonical" href="https://cononyc.gitee.io/2018/10/19/WebService/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>WebService | Me</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Me</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://cononyc.gitee.io/2018/10/19/WebService/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="C.c">
+      <meta itemprop="description" content="A Blog">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Me">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          WebService
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-10-19 09:42:07" itemprop="dateCreated datePublished" datetime="2018-10-19T09:42:07+08:00">2018-10-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-07-06 19:16:16" itemprop="dateModified" datetime="2021-07-06T19:16:16+08:00">2021-07-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/spring/" itemprop="url" rel="index">
+                    <span itemprop="name">spring</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>概念：<br>Web service是一个平台独立的，低耦合的，自包含的、基于可编程的web的应用程序，可使用开放的XML（标准通用标记语言下的一个子集）标准来描述、发布、发现、协调和配置这些应用程序，用于开发分布式的互操作的应用程序。<br><img src="http://imageu.oss-cn-shenzhen.aliyuncs.com/noteimage/webservice%E5%8E%9F%E7%90%86.png" alt="webservice原理"><br>webservice用到的技术主要有XML+XSD，SOAP和WSDL，XML Schema(XSD)定义了一套标准的数据类型，并给出了一种语言来扩展这套数据类型<br>完整的流程如下<br>客户端——&gt; 阅读WSDL文档 (根据文档生成SOAP请求) ——&gt;发送到Web服务器——&gt;交给WebService请求处理器 （ISAPI Extension）</p>
+<p>——&gt;处理SOAP请求——&gt; 调用WebService——&gt;生成SOAP应答 ——&gt; Web服务器通过http的方式交给客户端</p>
+<hr>
+<h2 id="了解"><a href="#了解" class="headerlink" title="了解"></a>了解</h2><h3 id="WSDL"><a href="#WSDL" class="headerlink" title="WSDL"></a>WSDL</h3><p>WSDL(Web Servie Description Language)是一个基于xml的web service描述语言</p>
+<blockquote>
+<p>WSDL 是一种使用 XML 编写的文档。这种文档可描述某个 Web service。它可规定服务的位置，以及此服务提供的操作（或方法）。</p>
+</blockquote>
+<p>WSDL通过下面几个参数描述webservice</p>
+<table>
+<thead>
+<tr>
+<th>元素</th>
+<th>定义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><message></td>
+<td>web service 使用的消息</td>
+</tr>
+<tr>
+<td><types></td>
+<td>web service 使用的数据类型</td>
+</tr>
+<tr>
+<td><binding></td>
+<td>web service 使用的通信协议</td>
+</tr>
+<tr>
+<td><img src="http://imageu.oss-cn-shenzhen.aliyuncs.com/noteimage/wsdl.png" alt="wsdl"></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id="SOAP协议"><a href="#SOAP协议" class="headerlink" title="SOAP协议"></a>SOAP协议</h3><p>SOAP(Simple Object Access Protocol)基于xml和HTTP的简单对象交换协议</p>
+<p>webService三要素</p>
+<blockquote>
+<p>SOAP、WSDL(WebServicesDescriptionLanguage)、UDDI(UniversalDescriptionDiscovery<br>andIntegration)之一， soap用来描述传递信息的格式， WSDL 用来描述如何访问具体的接口，<br>uddi用来管理，分发，查询webService 。具体实现可以搜索 Web Services简单实例 ; SOAP<br>可以和现存的许多因特网协议和格式结合使用，包括超文本传输协议（HTTP），简单邮件传输协议（SMTP），多用途网际邮件扩充协议（MIME）。它还支持从消息系统到远程过程调用（RPC）等大量的应用程序。SOAP使用基于XML的数据结构和超文本传输协议(HTTP)的组合定义了一个标准的方法来使用Internet上各种不同操作环境中的分布式对象。</p>
+</blockquote>
+<p>webservice的开发主要是服务端和客户端，服务端发布服务，客户端调用服务。</p>
+<h3 id="UDDI注册中心"><a href="#UDDI注册中心" class="headerlink" title="UDDI注册中心"></a>UDDI注册中心</h3><blockquote>
+<p>UDDI 是一种目录服务，企业可以使用它对 Web services 进行注册和搜索。 UDDI，英文为 “Universal<br>Description, Discovery and Integration”，可译为“通用描述、发现与集成服务”。 UDDI<br>是一个独立于平台的框架，用于通过使用 Internet 来描述服务，发现企业，并对企业服务进行集成</p>
+</blockquote>
+<p>简而言之就是一个webservice的注册中心，当需要一个webservice的服务的时候可以到UDDI去寻找，并调用对应的服务。也可以直接告诉webservice的地址就可以调用了</p>
+<hr>
+<h2 id="发布前准备"><a href="#发布前准备" class="headerlink" title="发布前准备"></a>发布前准备</h2><p>一个用于WebService的类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> javax.jws.WebMethod;</span><br><span class="line"><span class="keyword">import</span> javax.jws.WebParam;</span><br><span class="line"><span class="keyword">import</span> javax.jws.WebService;</span><br><span class="line"><span class="keyword">import</span> javax.jws.soap.SOAPBinding;</span><br><span class="line"><span class="keyword">import</span> javax.xml.ws.BindingType;</span><br><span class="line"></span><br><span class="line"><span class="meta">@WebService(targetNamespace = Constants.NSPACE)</span></span><br><span class="line"><span class="meta">@BindingType()</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">HelloCxfInterface</span> </span>&#123;</span><br><span class="line">    <span class="comment">//@WebService是必须的；@WebParam不是必须的。</span></span><br><span class="line">    <span class="comment">//如果没有@WebParam的描述，在wsdl文件内描述的方法中，参数名将变为arg0,arg1…以此类推.</span></span><br><span class="line">    <span class="meta">@SOAPBinding(use = SOAPBinding.Use.ENCODED,style = SOAPBinding.Style.RPC,parameterStyle = SOAPBinding.ParameterStyle.BARE)</span></span><br><span class="line">    <span class="meta">@WebMethod(action = &quot;www.baidu.com&quot;,operationName = &quot;say&quot;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">sayHello</span><span class="params">(<span class="meta">@WebParam(name = &quot;name&quot;)</span> String people)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@SOAPBinding(use = SOAPBinding.Use.ENCODED,style = SOAPBinding.Style.RPC)</span></span><br><span class="line">    <span class="meta">@WebMethod(action = &quot;www.baidu.com&quot;,operationName = &quot;getUser&quot;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> UserDTO <span class="title">getUser</span><span class="params">(String userId)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@WebService(endpointInterface = &quot;cn.cases.webservice.beans.HelloCxfInterface&quot;,//&lt;wsdl:portType name=&quot;HelloCxfInterface&quot;&gt;</span></span><br><span class="line"><span class="meta">        serviceName=&quot;HelloService&quot;,//&lt;wsdl:portType name=&quot;HelloService&quot;&gt;</span></span><br><span class="line"><span class="meta">        targetNamespace = Constants.NSPACE,</span></span><br><span class="line"><span class="meta">        name = &quot;Hello&quot;)</span><span class="comment">//&lt;wsdl:port binding=&quot;tns:HelloServiceSoapBinding&quot; name=&quot;HelloPort&quot;&gt;</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HelloCxf</span> <span class="keyword">implements</span> <span class="title">HelloCxfInterface</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">sayHello</span><span class="params">(String people)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;Hello &quot;</span>+people;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> UserDTO <span class="title">getUser</span><span class="params">(String userId)</span> </span>&#123;</span><br><span class="line">        UserDTO dto = <span class="keyword">new</span> UserDTO();</span><br><span class="line">        dto.setId(Long.parseLong(<span class="string">&quot;1001&quot;</span>));</span><br><span class="line">        dto.setLoginName(<span class="string">&quot;safdas&quot;</span>);</span><br><span class="line">        dto.setName(<span class="string">&quot;张三&quot;</span>);</span><br><span class="line">        dto.setEmail(<span class="string">&quot;sdasf@qq.com&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> dto;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getOne</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;One&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="发布WebService"><a href="#发布WebService" class="headerlink" title="发布WebService"></a>发布WebService</h2><p>关于wsdl中的soap消息绑定机制，可以参考：<a target="_blank" rel="noopener" href="http://blog.csdn.net/seasky323/article/details/6746174">SOAP消息绑定机制</a>，<a target="_blank" rel="noopener" href="https://www.ibm.com/developerworks/cn/xml/x-sisoap/">浅谈SOAP</a></p>
+<h3 id="使用Java原生的WebService"><a href="#使用Java原生的WebService" class="headerlink" title="使用Java原生的WebService"></a>使用Java原生的WebService</h3><p>参考：<a target="_blank" rel="noopener" href="http://www.cnblogs.com/decarl/archive/2012/05/15/2502074.html">Web Service开篇</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JaxWsServerListener</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Log log = LogFactory.getLog(JaxWsServerListener.class);</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        CxfService cxfService = <span class="keyword">new</span> CxfServiceImpl();</span><br><span class="line">        String address = <span class="string">&quot;http://localhost/hello&quot;</span>;</span><br><span class="line"></span><br><span class="line">        Endpoint.publish(address,cxfService);</span><br><span class="line">        log.info(<span class="string">&quot;暴露成功！&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="使用Axis1-x发布"><a href="#使用Axis1-x发布" class="headerlink" title="使用Axis1.x发布"></a>使用Axis1.x发布</h3><p>参考：<a target="_blank" rel="noopener" href="http://www.cnblogs.com/hoojo/archive/2010/12/20/1911363.html">Axis1.x WebService开发指南</a><br>Axis有两种方式发布，一种是<code>jws</code>方式，一种是<code>wsdd</code>方式<br>第一种方式操作简单，但是一般不怎么用，可以参考：<a target="_blank" rel="noopener" href="http://www.cnblogs.com/hoojo/archive/2010/12/20/1911357.html">使用jws方式发布</a><br>这里介绍wsdd方式<br>导入pom.xml</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>axis<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>axis<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.4<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>在web.xml中配置</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">servlet</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">display-name</span>&gt;</span>Apache-Axis Servlet<span class="tag">&lt;/<span class="name">display-name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>AxisServlet<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">servlet-class</span>&gt;</span>org.apache.axis.transport.http.AxisServlet<span class="tag">&lt;/<span class="name">servlet-class</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">servlet</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">servlet</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">display-name</span>&gt;</span>Axis Admin Servlet<span class="tag">&lt;/<span class="name">display-name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>AdminServlet<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">servlet-class</span>&gt;</span>org.apache.axis.transport.http.AdminServlet<span class="tag">&lt;/<span class="name">servlet-class</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">load-on-startup</span>&gt;</span>100<span class="tag">&lt;/<span class="name">load-on-startup</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">servlet</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">servlet</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">display-name</span>&gt;</span>SOAPMonitorService<span class="tag">&lt;/<span class="name">display-name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>SOAPMonitorService<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">servlet-class</span>&gt;</span>org.apache.axis.monitor.SOAPMonitorService<span class="tag">&lt;/<span class="name">servlet-class</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">init-param</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">param-name</span>&gt;</span>SOAPMonitorPort<span class="tag">&lt;/<span class="name">param-name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">param-value</span>&gt;</span>5101<span class="tag">&lt;/<span class="name">param-value</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">init-param</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">load-on-startup</span>&gt;</span>100<span class="tag">&lt;/<span class="name">load-on-startup</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">servlet</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">servlet-mapping</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>AxisServlet<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>/servlet/AxisServlet<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">servlet-mapping</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">servlet-mapping</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>AxisServlet<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>*.jws<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">servlet-mapping</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">servlet-mapping</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>AxisServlet<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>/services/*<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">servlet-mapping</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">servlet-mapping</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>SOAPMonitorService<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>/SOAPMonitor<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">servlet-mapping</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">servlet-mapping</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>AdminServlet<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>/servlet/AdminServlet<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">servlet-mapping</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">mime-mapping</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">extension</span>&gt;</span>wsdl<span class="tag">&lt;/<span class="name">extension</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">mime-type</span>&gt;</span>text/xml<span class="tag">&lt;/<span class="name">mime-type</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">mime-mapping</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>在<code>WEB-INF</code>目录下创建一个<code>server-config.wsdd</code>文件，里面添加如下内容。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">deployment</span> <span class="attr">xmlns</span>=<span class="string">&quot;http://xml.apache.org/axis/wsdd/&quot;</span> <span class="attr">xmlns:java</span>=<span class="string">&quot;http://xml.apache.org/axis/wsdd/providers/java&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">globalConfiguration</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">&quot;sendMultiRefs&quot;</span> <span class="attr">value</span>=<span class="string">&quot;true&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">&quot;disablePrettyXML&quot;</span> <span class="attr">value</span>=<span class="string">&quot;true&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">&quot;adminPassword&quot;</span> <span class="attr">value</span>=<span class="string">&quot;admin&quot;</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">&quot;dotNetSoapEncFix&quot;</span> <span class="attr">value</span>=<span class="string">&quot;true&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">&quot;enableNamespacePrefixOptimization&quot;</span> <span class="attr">value</span>=<span class="string">&quot;false&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">&quot;sendXMLDeclaration&quot;</span> <span class="attr">value</span>=<span class="string">&quot;true&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">&quot;sendXsiTypes&quot;</span> <span class="attr">value</span>=<span class="string">&quot;true&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">&quot;attachments.implementation&quot;</span> <span class="attr">value</span>=<span class="string">&quot;org.apache.axis.attachments.AttachmentsImpl&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">requestFlow</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">handler</span> <span class="attr">type</span>=<span class="string">&quot;java:org.apache.axis.handlers.JWSHandler&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">&quot;scope&quot;</span> <span class="attr">value</span>=<span class="string">&quot;session&quot;</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">handler</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">handler</span> <span class="attr">type</span>=<span class="string">&quot;java:org.apache.axis.handlers.JWSHandler&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">&quot;scope&quot;</span> <span class="attr">value</span>=<span class="string">&quot;request&quot;</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">&quot;extension&quot;</span> <span class="attr">value</span>=<span class="string">&quot;.jwr&quot;</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">handler</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">requestFlow</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">globalConfiguration</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">handler</span> <span class="attr">name</span>=<span class="string">&quot;LocalResponder&quot;</span> <span class="attr">type</span>=<span class="string">&quot;java:org.apache.axis.transport.local.LocalResponder&quot;</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">handler</span> <span class="attr">name</span>=<span class="string">&quot;URLMapper&quot;</span> <span class="attr">type</span>=<span class="string">&quot;java:org.apache.axis.handlers.http.URLMapper&quot;</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">handler</span> <span class="attr">name</span>=<span class="string">&quot;Authenticate&quot;</span> <span class="attr">type</span>=<span class="string">&quot;java:org.apache.axis.handlers.SimpleAuthenticationHandler&quot;</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">service</span> <span class="attr">name</span>=<span class="string">&quot;AdminService&quot;</span> <span class="attr">provider</span>=<span class="string">&quot;java:MSG&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">&quot;allowedMethods&quot;</span> <span class="attr">value</span>=<span class="string">&quot;AdminService&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">&quot;enableRemoteAdmin&quot;</span> <span class="attr">value</span>=<span class="string">&quot;false&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">&quot;className&quot;</span> <span class="attr">value</span>=<span class="string">&quot;org.apache.axis.utils.Admin&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">namespace</span>&gt;</span>http://xml.apache.org/axis/wsdd/<span class="tag">&lt;/<span class="name">namespace</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">service</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">service</span> <span class="attr">name</span>=<span class="string">&quot;Version&quot;</span> <span class="attr">provider</span>=<span class="string">&quot;java:RPC&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">&quot;allowedMethods&quot;</span> <span class="attr">value</span>=<span class="string">&quot;getVersion&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">&quot;className&quot;</span> <span class="attr">value</span>=<span class="string">&quot;org.apache.axis.Version&quot;</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">service</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">service</span> <span class="attr">name</span>=<span class="string">&quot;SOAPMonitorService&quot;</span> <span class="attr">provider</span>=<span class="string">&quot;java:RPC&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">&quot;allowedMethods&quot;</span> <span class="attr">value</span>=<span class="string">&quot;publishMessage&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">&quot;scope&quot;</span> <span class="attr">value</span>=<span class="string">&quot;Application&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">&quot;className&quot;</span> <span class="attr">value</span>=<span class="string">&quot;org.apache.axis.monitor.SOAPMonitorService&quot;</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">service</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!--自己的webservice--&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">service</span> <span class="attr">name</span>=<span class="string">&quot;MyCService&quot;</span> <span class="attr">provider</span>=<span class="string">&quot;java:RPC&quot;</span> <span class="attr">style</span>=<span class="string">&quot;RPC&quot;</span> <span class="attr">use</span>=<span class="string">&quot;encoded&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">&quot;className&quot;</span> <span class="attr">value</span>=<span class="string">&quot;cn.ws.webservice.InfoService&quot;</span>/&gt;</span></span><br><span class="line">    <span class="comment">&lt;!--设置发布的方法，以空格分隔--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">&quot;allowedMethods&quot;</span> <span class="attr">value</span>=<span class="string">&quot;Method1 Method2&quot;</span>/&gt;</span></span><br><span class="line">    <span class="comment">&lt;!--设置--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">&quot;scope&quot;</span> <span class="attr">value</span>=<span class="string">&quot;request&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">namespace</span>&gt;</span>http://case.cn<span class="tag">&lt;/<span class="name">namespace</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">service</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">handler</span> <span class="attr">name</span>=<span class="string">&quot;soapmonitor&quot;</span> <span class="attr">type</span>=<span class="string">&quot;java:org.apache.axis.handlers.SOAPMonitorHandler&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">&quot;wsdlURL&quot;</span> <span class="attr">value</span>=<span class="string">&quot;/axis/SOAPMonitorService-impl.wsdl&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">&quot;serviceName&quot;</span> <span class="attr">value</span>=<span class="string">&quot;SOAPMonitorService&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">&quot;namespace&quot;</span> <span class="attr">value</span>=<span class="string">&quot;http://tempuri.org/wsdl/2001/12/SOAPMonitorService-impl.wsdl&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">&quot;portName&quot;</span> <span class="attr">value</span>=<span class="string">&quot;Demo&quot;</span>/&gt;</span></span><br><span class="line"> <span class="tag">&lt;/<span class="name">handler</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">transport</span> <span class="attr">name</span>=<span class="string">&quot;http&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">requestFlow</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">handler</span> <span class="attr">type</span>=<span class="string">&quot;URLMapper&quot;</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">handler</span> <span class="attr">type</span>=<span class="string">&quot;java:org.apache.axis.handlers.http.HTTPAuthHandler&quot;</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">      <span class="comment">&lt;!--comment following line for REMOVING wsdl spying via SOAPMonitor--&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">handler</span> <span class="attr">type</span>=<span class="string">&quot;soapmonitor&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">requestFlow</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">responseFlow</span>&gt;</span></span><br><span class="line">      <span class="comment">&lt;!--comment following line for REMOVING wsdl spying via SOAPMonitor--&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">handler</span> <span class="attr">type</span>=<span class="string">&quot;soapmonitor&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">responseFlow</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">&quot;qs:list&quot;</span> <span class="attr">value</span>=<span class="string">&quot;org.apache.axis.transport.http.QSListHandler&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">&quot;qs:wsdl&quot;</span> <span class="attr">value</span>=<span class="string">&quot;org.apache.axis.transport.http.QSWSDLHandler&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">&quot;qs.list&quot;</span> <span class="attr">value</span>=<span class="string">&quot;org.apache.axis.transport.http.QSListHandler&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">&quot;qs.method&quot;</span> <span class="attr">value</span>=<span class="string">&quot;org.apache.axis.transport.http.QSMethodHandler&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">&quot;qs:method&quot;</span> <span class="attr">value</span>=<span class="string">&quot;org.apache.axis.transport.http.QSMethodHandler&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">&quot;qs.wsdl&quot;</span> <span class="attr">value</span>=<span class="string">&quot;org.apache.axis.transport.http.QSWSDLHandler&quot;</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">transport</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">transport</span> <span class="attr">name</span>=<span class="string">&quot;local&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">responseFlow</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">handler</span> <span class="attr">type</span>=<span class="string">&quot;LocalResponder&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">responseFlow</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">transport</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">deployment</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>上面这一步也可以使用axis提供的工具生成，具体操作可参考:<a target="_blank" rel="noopener" href="http://blog.csdn.net/qq_14852397/article/details/46385713">定制发布</a><br>需要将项目编译之后在WEB-INF下面打开命令行窗口，执行下面的命令</p>
+<pre><code>java -Djava.ext.dirs=lib org.apache.axis.client.AdminClient deploy.wsdd</code></pre><p>如果执行上面的命令出现404的错误，就使用下面的命令，这里的端口号根据tomcat启动的端口号行，如果有上下文路径要加入上下文路径</p>
+<pre><code>java -Djava.ext.dirs=lib org.apache.axis.client.AdminClient -lhttp://localhost:8080/services/AdminService deploy.wsdd</code></pre><p>执行了之后会在目录中生成一个叫<code>server-config.wsdd</code>的文件，将这个文件复制项目中的<code>WEB-INF</code>下面就可以了。</p>
+<p>deploy.wsdd需要自己编写放在<code>WEB-INF</code>下内容如下</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">deployment</span> <span class="attr">name</span>=<span class="string">&quot;test&quot;</span> <span class="attr">xmlns</span>=<span class="string">&quot;http://xml.apache.org/axis/wsdd/&quot;</span></span></span><br><span class="line"><span class="tag">            <span class="attr">xmlns:java</span>=<span class="string">&quot;http://xml.apache.org/axis/wsdd/providers/java&quot;</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- provider=”java:RPC”是服务类型，除了RPC方式以外，还有Document、Wrapped和Message方式 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">service</span> <span class="attr">name</span>=<span class="string">&quot;MyService&quot;</span> <span class="attr">provider</span>=<span class="string">&quot;java:RPC&quot;</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- 告诉服务应该调用的类 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">&quot;className&quot;</span> <span class="attr">value</span>=<span class="string">&quot;cn.ws.webservice.InfoService&quot;</span> /&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- * 代表所有的方法都暴露 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">&quot;allowedMethods&quot;</span> <span class="attr">value</span>=<span class="string">&quot;Method1 Method2&quot;</span> /&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- 当前WebService的作用域，分别是：request、session、application --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">parameter</span> <span class="attr">name</span>=<span class="string">&quot;scope&quot;</span> <span class="attr">value</span>=<span class="string">&quot;application&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">service</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">deployment</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>wsdd的一些详细配置可以参考:<a target="_blank" rel="noopener" href="http://blog.csdn.net/u011063151/article/details/52590282">最详细的WSDD配置文件注释</a><br>使用idea可以快速的创建<code>Axis</code>的项目文件,其他IDE工具应该都有这个功能，这里没有试过。<br>发布好的webservice访问界面如下<br><img src="http://imageu.oss-cn-shenzhen.aliyuncs.com/noteimage/axis%E5%8F%91%E5%B8%83%E6%88%90%E5%8A%9F.png" alt="axis发布成功"></p>
+<p>这里的MyService就是自己部署Service下面对应发布的方法，其他的几个Service是axis自带的一些Service。<br>注：发布的时候如果出现异常<code>ClassNotFound</code>+发布类的权限定名，是因为要发布的类没有编译导致的，重新编译项目即可。</p>
+<h3 id="使用CXF发布-和Spring集成"><a href="#使用CXF发布-和Spring集成" class="headerlink" title="使用CXF发布(和Spring集成)"></a>使用CXF发布(和Spring集成)</h3><p>导入pom.xml</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.cxf<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>cxf-rt-frontend-jaxws<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.1.8<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.cxf<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>cxf-rt-transports-http<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.1.8<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>注：Spring版本使用4.2.0以上的，CXF的版本必须在3.0以上，要不然会报下面这个错<br><code>java.lang.NoSuchMethodError:org.springframework.aop.support.AopUtils.isCglibProxyClass(Ljava/lang/Class;)</code><br>在web.xml中加入Servlet</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">servlet</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>cxf<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">servlet-class</span>&gt;</span>org.apache.cxf.transport.servlet.CXFServlet<span class="tag">&lt;/<span class="name">servlet-class</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">load-on-startup</span>&gt;</span>2<span class="tag">&lt;/<span class="name">load-on-startup</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">servlet</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">servlet-mapping</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>cxf<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>/services/*<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">servlet-mapping</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>在Spring的配置文件中加入下面的内容</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">&quot;http://www.springframework.org/schema/beans&quot;</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xmlns:xsi</span>=<span class="string">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xmlns:jaxws</span>=<span class="string">&quot;http://cxf.apache.org/jaxws&quot;</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xsi:schemaLocation</span>=<span class="string">&quot;http://www.springframework.org/schema/beans</span></span></span><br><span class="line"><span class="string"><span class="tag">        http://www.springframework.org/schema/beans/spring-beans.xsd</span></span></span><br><span class="line"><span class="string"><span class="tag">        http://cxf.apache.org/jaxws</span></span></span><br><span class="line"><span class="string"><span class="tag">        http://cxf.apache.org/schemas/jaxws.xsd&quot;</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!--  Cxf WebService 服务端示例,这里的implementor是Service的实现类，address是发布的地址的上下文路径 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">jaxws:endpoint</span> <span class="attr">id</span>=<span class="string">&quot;DemoWebservice&quot;</span> <span class="attr">implementor</span>=<span class="string">&quot;cn.cases.webservice.beans.HelloCxf&quot;</span> <span class="attr">address</span>=<span class="string">&quot;/demo&quot;</span>/&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>注：使用的时候要加入<code>xmlns:jaxws=&quot;http://cxf.apache.org/jaxws&quot;</code>等内容</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.Serializable;</span><br><span class="line"></span><br><span class="line"><span class="meta">@XmlRootElement</span></span><br><span class="line"><span class="meta">@XmlType(name = &quot;User&quot;, namespace = Constants.NSPACE)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserDTO</span> <span class="keyword">implements</span> <span class="title">Serializable</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Long id;</span><br><span class="line">    <span class="keyword">private</span> String loginName;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">    <span class="keyword">private</span> String email;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//略去getter/setter</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>暴露在外的接口</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> javax.jws.WebParam;</span><br><span class="line"><span class="keyword">import</span> javax.jws.WebService;</span><br><span class="line"></span><br><span class="line"><span class="meta">@WebService(targetNamespace = Constants.NSPACE)</span></span><br><span class="line"><span class="meta">@SOAPBinding(use = SOAPBinding.Use.ENCODED,style = SOAPBinding.Style.RPC,parameterStyle = SOAPBinding.ParameterStyle.WRAPPED)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">HelloCxfInterface</span> </span>&#123;</span><br><span class="line">    <span class="comment">//@WebService是必须的；@WebParam不是必须的。</span></span><br><span class="line">    <span class="comment">//如果没有@WebParam的描述，在wsdl文件内描述的方法中，参数名将变为arg0,arg1…以此类推.</span></span><br><span class="line">    <span class="meta">@WebMethod(action = &quot;www.baidu.com&quot;,operationName = &quot;say&quot;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">sayHello</span><span class="params">(<span class="meta">@WebParam(name = &quot;name&quot;)</span> String people)</span></span>;</span><br><span class="line">    <span class="meta">@WebMethod(action = &quot;www.baidu.com&quot;,operationName = &quot;getUser&quot;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> UserDTO <span class="title">getUser</span><span class="params">(String userId)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里的action对应的是生成的wsdl中的soapAction，soapAction是用来定义请求的地址的，可以为空，但是，SOAPBinding对应的是发送的SOAP消息中包含的内容，有几种模式，可以参考：<a target="_blank" rel="noopener" href="http://blog.csdn.net/etttttss/article/details/17412081">WSDL样式详解</a> <a target="_blank" rel="noopener" href="http://blog.csdn.net/seasky323/article/details/6746174">SOAP的消息绑定机制</a><br>接口实现类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@WebService(endpointInterface = &quot;cn.cases.webservice.beans.HelloCxfInterface&quot;,//&lt;wsdl:portType name=&quot;HelloCxfInterface&quot;&gt;</span></span><br><span class="line"><span class="meta">        serviceName=&quot;HelloService&quot;,//&lt;wsdl:portType name=&quot;HelloService&quot;&gt;</span></span><br><span class="line"><span class="meta">        targetNamespace = Constants.NSPACE,</span></span><br><span class="line"><span class="meta">        name = &quot;Hello&quot;)</span><span class="comment">//&lt;wsdl:port binding=&quot;tns:HelloServiceSoapBinding&quot; name=&quot;HelloPort&quot;&gt;</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HelloCxf</span> <span class="keyword">implements</span> <span class="title">HelloCxfInterface</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">sayHello</span><span class="params">(String people)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;Hello &quot;</span>+people;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> UserDTO <span class="title">getUser</span><span class="params">(String userId)</span> </span>&#123;</span><br><span class="line">        UserDTO dto = <span class="keyword">new</span> UserDTO();</span><br><span class="line">        dto.setId(Long.parseLong(<span class="string">&quot;1001&quot;</span>));</span><br><span class="line">        dto.setLoginName(<span class="string">&quot;safdas&quot;</span>);</span><br><span class="line">        dto.setName(<span class="string">&quot;张三&quot;</span>);</span><br><span class="line">        dto.setEmail(<span class="string">&quot;sdasf@qq.com&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> dto;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getOne</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;One&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里的接口和实现类都要加<code>@WebService</code>的标签，暴露在外的方法是以接口的方法来定的。如这里暴露在外的方法只有<code>sayHello()</code>和<code>getUser()</code>而没有<code>getOne()</code></p>
+<hr>
+<h2 id="客户端"><a href="#客户端" class="headerlink" title="客户端"></a>客户端</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.axis.client.Call;</span><br><span class="line"><span class="keyword">import</span> org.apache.axis.client.Service;</span><br><span class="line"><span class="keyword">import</span> javax.xml.namespace.QName;</span><br><span class="line"><span class="keyword">import</span> java.net.MalformedURLException;</span><br><span class="line">-------------------------------------------------------------------------</span><br><span class="line">      Call call = (Call) service.createCall();</span><br><span class="line">      <span class="comment">//设置地址</span></span><br><span class="line">      call.setTargetEndpointAddress(<span class="keyword">new</span> java.net.URL(<span class="string">&quot;http://localhost:8080/services/hello?wsdl&quot;</span>));</span><br><span class="line">      <span class="comment">//设置要执行的方法</span></span><br><span class="line">      call.setOperationName(<span class="keyword">new</span> QName(<span class="string">&quot;http://case.cn&quot;</span>,<span class="string">&quot;getUser&quot;</span>));</span><br><span class="line">      <span class="comment">//设置要传入参数,如果没有要传入的参数，则不要写这个</span></span><br><span class="line">      call.addParameter(<span class="string">&quot;arg0&quot;</span>, org.apache.axis.Constants.XSD_STRING,javax.xml.rpc.ParameterMode.IN);</span><br><span class="line">      <span class="comment">//设置返回的类型</span></span><br><span class="line">      call.setReturnType(<span class="keyword">new</span> javax.xml.namespace.QName(<span class="string">&quot;http://case.cn&quot;</span>, <span class="string">&quot;User&quot;</span>));</span><br><span class="line">      call.setReturnClass(User.class);</span><br><span class="line">      String name = <span class="string">&quot;获得对象&quot;</span>;</span><br><span class="line">      <span class="comment">//执行，调用webservice</span></span><br><span class="line">      User result = (User) call.invoke(<span class="keyword">new</span> Object[]&#123;name&#125;);</span><br><span class="line">      System.out.println(<span class="string">&quot;返回结果&quot;</span>+result.getEmail());</span><br></pre></td></tr></table></figure>
+<p>请求的SOAP消息</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">soapenv:Envelope</span> <span class="attr">xmlns:soapenv</span>=<span class="string">&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;</span> <span class="attr">xmlns:xsd</span>=<span class="string">&quot;http://www.w3.org/2001/XMLSchema&quot;</span> <span class="attr">xmlns:xsi</span>=<span class="string">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">soapenv:Body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">ns1:getUser</span> <span class="attr">xmlns:ns1</span>=<span class="string">&quot;http://case.cn&quot;</span> <span class="attr">soapenv:encodingStyle</span>=<span class="string">&quot;http://schemas.xmlsoap.org/soap/encoding/&quot;</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">arg0</span> <span class="attr">xsi:type</span>=<span class="string">&quot;xsd:string&quot;</span>&gt;</span>获得对象<span class="tag">&lt;/<span class="name">arg0</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">ns1:getUser</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">soapenv:Body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">soapenv:Envelope</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>响应的SOAP消息</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">soap:Envelope</span> <span class="attr">xmlns:soap</span>=<span class="string">&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">soap:Body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">ns2:getUserResponse</span> <span class="attr">xmlns:ns2</span>=<span class="string">&quot;http://case.cn&quot;</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">return</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">email</span>&gt;</span>sdasf@qq.com<span class="tag">&lt;/<span class="name">email</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">id</span>&gt;</span>1001<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">loginName</span>&gt;</span>safdas<span class="tag">&lt;/<span class="name">loginName</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>张三<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">return</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">ns2:getUserResponse</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">soap:Body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">soap:Envelope</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>注：这个客户端是axis的客户端，类都是axis包中的</p>
+<hr>
+<h2 id="Idea生成webservice（以axis1-x为例）"><a href="#Idea生成webservice（以axis1-x为例）" class="headerlink" title="Idea生成webservice（以axis1.x为例）"></a>Idea生成webservice（以axis1.x为例）</h2><p>IDE工具(如eclipse)应该都有这个功能，这里以idea为例</p>
+<hr>
+<h3 id="服务端"><a href="#服务端" class="headerlink" title="服务端"></a>服务端</h3><h4 id="新建的工程"><a href="#新建的工程" class="headerlink" title="新建的工程"></a>新建的工程</h4><p> <img src="http://imageu.oss-cn-shenzhen.aliyuncs.com/webservice-idea/servernew1.png" alt=""><br>这里会下载一些jar包，需要有网络才可以<br>生成项目如下：<br>  <img src="http://imageu.oss-cn-shenzhen.aliyuncs.com/webservice-idea/servernew2.png" alt=""><br>这里的server-config.wsdd就是axis1.x的配置文件，web.xml中加入了一些axis的servlet，如果要发布自己的webservice，需要在wsdd中加入<service></service>标签，如：<br>  <img src="http://imageu.oss-cn-shenzhen.aliyuncs.com/webservice-idea/servernew3.png" alt=""><br>配置一下tomcat就可以发布了访问地址为<br>项目访问地址+/services/+webservice名称?wsdl<br>可以用<br>项目访问地址+/services<br>查看axis发布的所有service<br>####已有的工程<br>  <img src="http://imageu.oss-cn-shenzhen.aliyuncs.com/webservice-idea/serverlocation1.png" alt=""></p>
+<p><img src="http://imageu.oss-cn-shenzhen.aliyuncs.com/webservice-idea/serverlocation2.png" alt=""><br>idea会自动在项目的WEB-INF下生成server-confg.wsdd，发布的服务也是配置service<br>web.xml也会自动加入axix的内容</p>
+<hr>
+<h3 id="客户端-1"><a href="#客户端-1" class="headerlink" title="客户端"></a>客户端</h3><h4 id="新建的工程-1"><a href="#新建的工程-1" class="headerlink" title="新建的工程"></a>新建的工程</h4><p> <img src="http://imageu.oss-cn-shenzhen.aliyuncs.com/webservice-idea/clientnew1.png" alt=""></p>
+<p>  <img src="http://imageu.oss-cn-shenzhen.aliyuncs.com/webservice-idea/clientnew2.png" alt=""><br>生成的main方法会有错误，这里需要手都更改一下第一行不用改导入包就可以了,locator.get+调用的类名<br> <img src="http://imageu.oss-cn-shenzhen.aliyuncs.com/webservice-idea/clientnew3.png" alt=""></p>
+<p><img src="http://imageu.oss-cn-shenzhen.aliyuncs.com/webservice-idea/clientnew4.png" alt=""></p>
+<p><img src="http://imageu.oss-cn-shenzhen.aliyuncs.com/webservice-idea/clientnew5.png" alt=""></p>
+<p>就可以通过service调用对应的方法了。<br>这里还需要导入junit的包</p>
+<h4 id="已有的工程"><a href="#已有的工程" class="headerlink" title="已有的工程"></a>已有的工程</h4><p><img src="http://imageu.oss-cn-shenzhen.aliyuncs.com/webservice-idea/clientlocation1.png" alt=""></p>
+<p><img src="http://imageu.oss-cn-shenzhen.aliyuncs.com/webservice-idea/clientlocation2.png" alt=""><br>点击OK，这个时候在一个包上点击右键New的时候就会出现webclient选项<br><img src="http://imageu.oss-cn-shenzhen.aliyuncs.com/webservice-idea/clientlocation3.png" alt=""><br>点击按照上面介绍的操作即可<br>注：使用axis1.x生成的客户端也可以调用cxf生成的webservice</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%9D%82/" rel="tag"># 杂</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/10/19/tomcat%E4%BC%98%E5%8C%96/" rel="prev" title=" Tomcat优化		">
+      <i class="fa fa-chevron-left"></i>  Tomcat优化		
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/10/19/css-%E9%80%89%E6%8B%A9%E5%99%A8/" rel="next" title=" css-选择器		">
+       css-选择器		 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%86%E8%A7%A3"><span class="nav-number">1.</span> <span class="nav-text">了解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#WSDL"><span class="nav-number">1.1.</span> <span class="nav-text">WSDL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SOAP%E5%8D%8F%E8%AE%AE"><span class="nav-number">1.2.</span> <span class="nav-text">SOAP协议</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#UDDI%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83"><span class="nav-number">1.3.</span> <span class="nav-text">UDDI注册中心</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%91%E5%B8%83%E5%89%8D%E5%87%86%E5%A4%87"><span class="nav-number">2.</span> <span class="nav-text">发布前准备</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%91%E5%B8%83WebService"><span class="nav-number">3.</span> <span class="nav-text">发布WebService</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8Java%E5%8E%9F%E7%94%9F%E7%9A%84WebService"><span class="nav-number">3.1.</span> <span class="nav-text">使用Java原生的WebService</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8Axis1-x%E5%8F%91%E5%B8%83"><span class="nav-number">3.2.</span> <span class="nav-text">使用Axis1.x发布</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8CXF%E5%8F%91%E5%B8%83-%E5%92%8CSpring%E9%9B%86%E6%88%90"><span class="nav-number">3.3.</span> <span class="nav-text">使用CXF发布(和Spring集成)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%A2%E6%88%B7%E7%AB%AF"><span class="nav-number">4.</span> <span class="nav-text">客户端</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Idea%E7%94%9F%E6%88%90webservice%EF%BC%88%E4%BB%A5axis1-x%E4%B8%BA%E4%BE%8B%EF%BC%89"><span class="nav-number">5.</span> <span class="nav-text">Idea生成webservice（以axis1.x为例）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E7%AB%AF"><span class="nav-number">5.1.</span> <span class="nav-text">服务端</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B0%E5%BB%BA%E7%9A%84%E5%B7%A5%E7%A8%8B"><span class="nav-number">5.1.1.</span> <span class="nav-text">新建的工程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%A2%E6%88%B7%E7%AB%AF-1"><span class="nav-number">5.2.</span> <span class="nav-text">客户端</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B0%E5%BB%BA%E7%9A%84%E5%B7%A5%E7%A8%8B-1"><span class="nav-number">5.2.1.</span> <span class="nav-text">新建的工程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B7%B2%E6%9C%89%E7%9A%84%E5%B7%A5%E7%A8%8B"><span class="nav-number">5.2.2.</span> <span class="nav-text">已有的工程</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">C.c</p>
+  <div class="site-description" itemprop="description">A Blog</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/CaseCy" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;CaseCy" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://liquidcat.cc/" title="Blog → https:&#x2F;&#x2F;liquidcat.cc" rel="noopener" target="_blank"><i class="fa fa-fw fa-gratipay"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://gitee.com/cononyc" title="Gitee → https:&#x2F;&#x2F;gitee.com&#x2F;cononyc" rel="noopener" target="_blank"><i class="fa fa-fw fa-user-circle"></i></a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+  <div class="beian"><a href="http://beian.miit.gov.cn/" rel="noopener" target="_blank">蜀ICP备2021018575号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">C.c</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://cononyc.gitee.io').hostname,
+    root: '/',
+    scheme: 'Mist',
+    version: '7.7.0',
+    exturl: false,
+    sidebar: {"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":false,"style":"flat"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="引用：log4j配置参考：玩转log4j  组成部分log4j由三个部分组成 Loggers(记录器)，Appenders (输出源)和Layouts(布局)log4j的日志被分为了几个级别，对应的级别及关系： DEBUG &lt; INFO &lt; WARN &lt; ERROR &lt; FATAL注：log4j输出日志的时候，只会输出和设定等级相等和比设定等级高的Log 常用的Logger">
+<meta property="og:type" content="article">
+<meta property="og:title" content=" log4j配置		">
+<meta property="og:url" content="https://cononyc.gitee.io/2018/10/19/log4j%E9%85%8D%E7%BD%AE/index.html">
+<meta property="og:site_name" content="Me">
+<meta property="og:description" content="引用：log4j配置参考：玩转log4j  组成部分log4j由三个部分组成 Loggers(记录器)，Appenders (输出源)和Layouts(布局)log4j的日志被分为了几个级别，对应的级别及关系： DEBUG &lt; INFO &lt; WARN &lt; ERROR &lt; FATAL注：log4j输出日志的时候，只会输出和设定等级相等和比设定等级高的Log 常用的Logger">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2018-10-19T02:23:08.000Z">
+<meta property="article:modified_time" content="2021-07-06T11:16:16.785Z">
+<meta property="article:author" content="C.c">
+<meta property="article:tag" content="配置相关">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://cononyc.gitee.io/2018/10/19/log4j%E9%85%8D%E7%BD%AE/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title> log4j配置		 | Me</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Me</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://cononyc.gitee.io/2018/10/19/log4j%E9%85%8D%E7%BD%AE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="C.c">
+      <meta itemprop="description" content="A Blog">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Me">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+           log4j配置		
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-10-19 10:23:08" itemprop="dateCreated datePublished" datetime="2018-10-19T10:23:08+08:00">2018-10-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-07-06 19:16:16" itemprop="dateModified" datetime="2021-07-06T19:16:16+08:00">2021-07-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%85%8D%E7%BD%AE%E7%9B%B8%E5%85%B3/" itemprop="url" rel="index">
+                    <span itemprop="name">配置相关</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>引用：<a target="_blank" rel="noopener" href="http://www.cnblogs.com/ITtangtang/p/3926665.html">log4j配置</a><br>参考：<a target="_blank" rel="noopener" href="http://www.cnblogs.com/shenliang123/archive/2012/05/02/2479286.html">玩转log4j</a></p>
+<hr>
+<h2 id="组成部分"><a href="#组成部分" class="headerlink" title="组成部分"></a>组成部分</h2><p>log4j由三个部分组成</p>
+<pre><code>Loggers(记录器)，Appenders (输出源)和Layouts(布局)</code></pre><p>log4j的日志被分为了几个级别，对应的级别及关系：</p>
+<pre><code>DEBUG &lt; INFO &lt; WARN &lt; ERROR &lt; FATAL</code></pre><p>注：log4j输出日志的时候，只会输出和设定等级相等和比设定等级高的Log</p>
+<h3 id="常用的Logger"><a href="#常用的Logger" class="headerlink" title="常用的Logger"></a>常用的Logger</h3><pre><code>org.apache.log4j.ConsoleAppender（控制台）
+org.apache.log4j.FileAppender（文件）
+org.apache.log4j.DailyRollingFileAppender（每天产生一个日志文件）
+org.apache.log4j.RollingFileAppender（文件大小到达指定尺寸的时候产生一个新的文件）
+org.apache.log4j.WriterAppender（将日志信息以流格式发送到任意指定的地方）</code></pre><h3 id="常用的Layout"><a href="#常用的Layout" class="headerlink" title="常用的Layout"></a>常用的Layout</h3><pre><code>org.apache.log4j.HTMLLayout（以HTML表格形式布局）
+org.apache.log4j.PatternLayout（可以灵活地指定布局模式）
+org.apache.log4j.SimpleLayout（包含日志信息的级别和信息字符串）
+org.apache.log4j.TTCCLayout（包含日志产生的时间、线程、类别等信息）</code></pre><hr>
+<h2 id="配置及语法"><a href="#配置及语法" class="headerlink" title="配置及语法"></a>配置及语法</h2><p>Log4j支持两种配置文件格式，一种是XML格式的文件，一种是properties属性文件，这里使用properites</p>
+<h3 id="配置根Logger"><a href="#配置根Logger" class="headerlink" title="配置根Logger"></a>配置根Logger</h3><pre><code>log4j.rootLogger = [ level ] , appenderName1, appenderName2, …
+log4j.additivity.org.apache=false：表示Logger不会在父Logger的appender里输出，默认为true。</code></pre><p>这里的appenderName可以自己定义，但是要在后面的配置中也使用<br>level表示输出日志的等级，log4j只建议使用ERROR、WARN、INFO、DEBUG（从高到低）<br>使用范例：</p>
+<pre><code>lo4j.rootLoger = DEBUG,a,b,c</code></pre><h3 id="配置日志输出位置-appender"><a href="#配置日志输出位置-appender" class="headerlink" title="配置日志输出位置(appender)"></a>配置日志输出位置(appender)</h3><pre><code>log4j.appender.appenderName = className</code></pre><p><code>className对应上面几种常用的Logger,appenderName对应根Logger的appenderName,以下不赘述</code><br>范例：</p>
+<pre><code>log4j.appender.a = org.apache.log4j.ConsoleAppender</code></pre><p>几种Logger都有的属性</p>
+<pre><code>Threshold=WARN：指定日志信息的最低输出级别，默认为DEBUG。
+ImmediateFlush=true：表示所有消息都会被立即输出，设为false则不输出，默认值是true。</code></pre><p>FileAppender，DailyRollingFileAppender，RollingFileAppender都有的属性</p>
+<pre><code>Append=false：true表示消息增加到指定文件中，false则将消息覆盖指定的文件内容，默认值是true。
+File=D:/logs/logging.log4j：指定消息输出到logging.log4j文件中。</code></pre><p>特有属性：</p>
+<ul>
+<li><code>ConsoleAppender</code><br> Target=System.err：默认值是System.out</li>
+<li><code>DailyRollingFileAppender</code><br> DatePattern=’.’yyyy-MM：每月滚动一次日志文件，即每月产生一个新的日志文件。当前月的日志文件名为logging.log4j，前一个月的日志文件名为logging.log4j.yyyy-MM。<br> 另外，也可以指定按周、天、时、分等来滚动日志文件，对应的格式如下：<br> 1)’.’yyyy-MM：每月<br> 2)’.’yyyy-ww：每周<br> 3)’.’yyyy-MM-dd：每天<br> 4)’.’yyyy-MM-dd-a：每天两次<br> 5)’.’yyyy-MM-dd-HH：每小时<br> 6)’.’yyyy-MM-dd-HH-mm：每分钟</li>
+<li><code>RollingFileAppender</code><br> MaxFileSize=100KB：后缀可以是KB,MB或者GB。在日志文件到达该大小时，将会自动滚动，即将原来的内容移到logging.log4j.1文件中。<br> MaxBackupIndex=2：指定可以产生的滚动文件的最大数，例如，设为2则可以产生logging.log4j.1，logging.log4j.2两个滚动文件和一个logging.log4j文件。</li>
+</ul>
+<p>范例：</p>
+<pre><code>log4j.appender.a.Target = System.err
+log4j.appender.a.Threshold = DEBUG</code></pre><h3 id="配置输出的形式-格式（Layout）"><a href="#配置输出的形式-格式（Layout）" class="headerlink" title="配置输出的形式/格式（Layout）"></a>配置输出的形式/格式（Layout）</h3><pre><code>log4j.appender.appenderName.layout=className</code></pre><p>这里的className指的是上面常用的Layout，以下不赘述<br>参数设置：</p>
+<ul>
+<li><p><code>HTMLLayout</code><br> LocationInfo=true：输出java文件名称和行号，默认值是false。<br>  Title=My Logging： 默认值是Log4J Log Messages。</p>
+</li>
+<li><p><code>PatternLayout</code><br> ConversionPattern=%m%n：设定以怎样的格式显示消息。</p>
+<figure class="highlight mel"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">格式化符号说明：</span><br><span class="line"></span><br><span class="line">%p：输出日志信息的优先级，即DEBUG，INFO，WARN，ERROR，FATAL。</span><br><span class="line">%d：输出日志时间点的日期或时间，默认格式为ISO8601，也可以在其后指定格式，如：%d&#123;yyyy/MM/dd HH:mm:ss,SSS&#125;。</span><br><span class="line">%r：输出自应用程序启动到输出该<span class="keyword">log</span>信息耗费的毫秒数。</span><br><span class="line">%t：输出产生该日志事件的线程名。</span><br><span class="line">%l：输出日志事件的发生位置，相当于%c.%M(%F:%L)的组合，包括类全名、方法、文件名以及在代码中的行数。例如：test.TestLog4j.main(TestLog4j.java:<span class="number">10</span>)。</span><br><span class="line">%c：输出日志信息所属的类目，通常就是所在类的全名。</span><br><span class="line">%M：输出产生日志信息的方法名。</span><br><span class="line">%F：输出日志消息产生时所在的文件名称。</span><br><span class="line">%L:：输出代码中的行号。</span><br><span class="line">%m:：输出代码中指定的具体日志信息。</span><br><span class="line">%n：输出一个回车换行符，Windows平台为<span class="string">&quot;rn&quot;</span>，Unix平台为<span class="string">&quot;n&quot;</span>。</span><br><span class="line">%x：输出和当前线程相关联的NDC(嵌套诊断环境)，尤其用到像java servlets这样的多客户多线程的应用中。</span><br><span class="line">%%：输出一个<span class="string">&quot;%&quot;</span>字符。</span><br><span class="line">另外，还可以在%与格式字符之间加上修饰符来控制其最小长度、最大长度、和文本的对齐方式。如：</span><br><span class="line"><span class="number">1</span>) c：指定输出category的名称，最小的长度是<span class="number">20</span>，如果category的名称长度小于<span class="number">20</span>的话，默认的情况下右对齐。</span><br><span class="line"><span class="number">2</span>)%-<span class="number">20</span>c：<span class="string">&quot;-&quot;</span>号表示左对齐。</span><br><span class="line"><span class="number">3</span>)%.<span class="number">30</span>c：指定输出category的名称，最大的长度是<span class="number">30</span>，如果category的名称长度大于<span class="number">30</span>的话，就会将左边多出的字符截掉，但小于<span class="number">30</span>的话也不会补空格。</span><br></pre></td></tr></table></figure>
+<p>范例:</p>
+<p> log4j.appender.c.layout=org.apache.log4j.PatternLayout<br> log4j.appender.c.layout.ConversionPattern=[%-5p] [%d{yyyy-MM-dd HH:mm:ss}][%t] %c - %x %m%n</p>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><h3 id="特定类输出不同个log"><a href="#特定类输出不同个log" class="headerlink" title="特定类输出不同个log"></a>特定类输出不同个log</h3><p>在Java类中说明</p>
+<p> private static Log logger = LogFactory.getLog(Test.class);<br>说明：这里的LogFactory是<code>commons-logging</code>包中的，这个包不是Log4j的，是一个日志通用包，Log4j实现了其中的接口，这里通过LogFactory来获得日志对象，以后更改的时候会比较方便<br>然后在log4j.properties中加入:</p>
+<p> log4j.logger.cn.com.Test= DEBUG, test<br> log4j.appender.test=org.apache.log4j.FileAppender<br> log4j.appender.test.File=${myweb.root}/WEB-INF/log/test.log<br> log4j.appender.test.layout=org.apache.log4j.PatternLayout<br> log4j.appender.test.layout.ConversionPattern=%d %p [%c] - %m%n</p>
+<h3 id="同一个类输出多个log"><a href="#同一个类输出多个log" class="headerlink" title="同一个类输出多个log"></a>同一个类输出多个log</h3><p>Java类中：</p>
+<p> private static Log logger = LogFactory.getLog(“test”);<br> private static Log logger = LogFactory.getLog(“test1”);<br>log4j.properties中加入:</p>
+<p> log4j.logger.test= DEBUG, test<br> …配置信息略去</p>
+<p> log4j.logger.test1= DEBUG, test1<br> …配置信息略去</p>
+</li>
+</ul>
+<blockquote>
+<p>这些自定义的日志默认是同时输出到log4j.rootLogger所配置的日志中的，通过设置下面的属性可以更改<br>log4j.additivity.test1 = false<br>　　它用来设置是否同时输出到log4j.rootLogger所配置的日志中，设为false就不会输出到其它地方啦注意这里的”test1”是在程序中给logger起的那个自定义的名字！<br>如果你说，我只是不想同时输出这个日志到log4j.rootLogger所配置的logfile中，stdout里我还想同时输出呢！那也好办，把你的log4j.logger.myTest1 = DEBUG, test1改为下式就OK啦！ log4j.logger.test1=DEBUG, test1</p>
+</blockquote>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><p>在<code>src</code>等级的目录下新建文件<code>log4j.properties</code>将配置写入就可以使用了</p>
+<hr>
+<figure class="highlight clean"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">#设置根级别</span><br><span class="line">#a为控制台输出。b为日志输出。c为错误日志</span><br><span class="line">#DEBUG &lt; INFO &lt; WARN &lt; ERROR &lt; FATAL</span><br><span class="line">log4j.rootLogger = DEBUG,a,c</span><br><span class="line">################################</span><br><span class="line">#设置每个日志输出的等级</span><br><span class="line">log4j.appender.a.Threshold = DEBUG</span><br><span class="line">#log4j.appender.b.Threshold = INFO</span><br><span class="line">log4j.appender.c.Threshold = ERROR</span><br><span class="line">################################</span><br><span class="line">#设置spring的log级别</span><br><span class="line">log4j.logger.org.springframework=ERROR</span><br><span class="line">################################</span><br><span class="line">#输出</span><br><span class="line">log4j.appender.a = org.apache.log4j.ConsoleAppender</span><br><span class="line">#Target输出的格式。可以写System.err和System.out(默认)</span><br><span class="line">log4j.appender.a.Target = System.out</span><br><span class="line">#指定输出的格式</span><br><span class="line">log4j.appender.a.layout =org.apache.log4j.PatternLayout</span><br><span class="line">log4j.appender.a.layout.ConversionPattern=[%<span class="number">-5</span>p] %d(%r) --&gt; [%t] %l: %m %x %n</span><br><span class="line">###############################</span><br><span class="line">#输出到日志（文件）</span><br><span class="line">log4j.appender.c = org.apache.log4j.DailyRollingFileAppender</span><br><span class="line">log4j.appender.c.File = $&#123;log.dir&#125;/error.log</span><br><span class="line">#指定输出的格式</span><br><span class="line">log4j.appender.c.layout =org.apache.log4j.PatternLayout</span><br><span class="line">log4j.appender.c.layout.ConversionPattern=[%<span class="number">-5</span>p] %d(%r) --&gt; [%t] %l: %m %x %n</span><br><span class="line">##################################</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%85%8D%E7%BD%AE%E7%9B%B8%E5%85%B3/" rel="tag"># 配置相关</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/10/19/%E4%BB%A3%E7%90%86%E6%A8%A1%E5%BC%8F/" rel="prev" title=" 代理模式		">
+      <i class="fa fa-chevron-left"></i>  代理模式		
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/10/22/dockerfile/" rel="next" title=" DockerFile		">
+       DockerFile		 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%84%E6%88%90%E9%83%A8%E5%88%86"><span class="nav-number">1.</span> <span class="nav-text">组成部分</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E7%9A%84Logger"><span class="nav-number">1.1.</span> <span class="nav-text">常用的Logger</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E7%9A%84Layout"><span class="nav-number">1.2.</span> <span class="nav-text">常用的Layout</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E5%8F%8A%E8%AF%AD%E6%B3%95"><span class="nav-number">2.</span> <span class="nav-text">配置及语法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E6%A0%B9Logger"><span class="nav-number">2.1.</span> <span class="nav-text">配置根Logger</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E6%97%A5%E5%BF%97%E8%BE%93%E5%87%BA%E4%BD%8D%E7%BD%AE-appender"><span class="nav-number">2.2.</span> <span class="nav-text">配置日志输出位置(appender)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E8%BE%93%E5%87%BA%E7%9A%84%E5%BD%A2%E5%BC%8F-%E6%A0%BC%E5%BC%8F%EF%BC%88Layout%EF%BC%89"><span class="nav-number">2.3.</span> <span class="nav-text">配置输出的形式&#x2F;格式（Layout）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96"><span class="nav-number">3.</span> <span class="nav-text">其他</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%B9%E5%AE%9A%E7%B1%BB%E8%BE%93%E5%87%BA%E4%B8%8D%E5%90%8C%E4%B8%AAlog"><span class="nav-number">3.1.</span> <span class="nav-text">特定类输出不同个log</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%8C%E4%B8%80%E4%B8%AA%E7%B1%BB%E8%BE%93%E5%87%BA%E5%A4%9A%E4%B8%AAlog"><span class="nav-number">3.2.</span> <span class="nav-text">同一个类输出多个log</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8"><span class="nav-number">4.</span> <span class="nav-text">使用</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">C.c</p>
+  <div class="site-description" itemprop="description">A Blog</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/CaseCy" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;CaseCy" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://liquidcat.cc/" title="Blog → https:&#x2F;&#x2F;liquidcat.cc" rel="noopener" target="_blank"><i class="fa fa-fw fa-gratipay"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://gitee.com/cononyc" title="Gitee → https:&#x2F;&#x2F;gitee.com&#x2F;cononyc" rel="noopener" target="_blank"><i class="fa fa-fw fa-user-circle"></i></a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+  <div class="beian"><a href="http://beian.miit.gov.cn/" rel="noopener" target="_blank">蜀ICP备2021018575号 </a>
+  </div>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">C.c</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
