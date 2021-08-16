@@ -20,7 +20,7 @@
 <script id="hexo-configurations">
   var NexT = window.NexT || {};
   var CONFIG = {
-    hostname: new URL('https://cononyc.gitee.io').hostname,
+    hostname: new URL('https://casecy.github.io').hostname,
     root: '/',
     scheme: 'Mist',
     version: '7.7.0',
@@ -50,19 +50,19 @@
   <meta name="description" content="持久化使用持久化能够保证数据不会程序退出等造成数据丢失的情况，重启时利用持久化文件就可以实现数据恢复。 redis支持两种持久化方式：  RDB：RDB是把当前进程数据生成快照保存到硬盘的过程，可手动触发和自动触发 AOF（append only file）：以独立的日志方式记录每次写命令。重启时重新执行AOF文件中的命令以恢复数据  RDB手动触发 save命令 bgsave命令  save命令">
 <meta property="og:type" content="article">
 <meta property="og:title" content="redis持久化和哨兵">
-<meta property="og:url" content="https://cononyc.gitee.io/2020/01/15/redis%E6%8C%81%E4%B9%85%E5%8C%96%E5%92%8C%E5%93%A8%E5%85%B5/index.html">
+<meta property="og:url" content="https://casecy.github.io/2020/01/15/redis%E6%8C%81%E4%B9%85%E5%8C%96%E5%92%8C%E5%93%A8%E5%85%B5/index.html">
 <meta property="og:site_name" content="Me">
 <meta property="og:description" content="持久化使用持久化能够保证数据不会程序退出等造成数据丢失的情况，重启时利用持久化文件就可以实现数据恢复。 redis支持两种持久化方式：  RDB：RDB是把当前进程数据生成快照保存到硬盘的过程，可手动触发和自动触发 AOF（append only file）：以独立的日志方式记录每次写命令。重启时重新执行AOF文件中的命令以恢复数据  RDB手动触发 save命令 bgsave命令  save命令">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://cononyc.gitee.io/static/redis%E9%87%8D%E5%90%AF%E5%8A%A0%E8%BD%BD%E6%B5%81%E7%A8%8B%E5%9B%BE.png">
+<meta property="og:image" content="https://casecy.github.io/static/redis%E9%87%8D%E5%90%AF%E5%8A%A0%E8%BD%BD%E6%B5%81%E7%A8%8B%E5%9B%BE.png">
 <meta property="article:published_time" content="2020-01-15T01:05:38.000Z">
 <meta property="article:modified_time" content="2021-07-06T11:16:16.787Z">
 <meta property="article:author" content="C.c">
 <meta property="article:tag" content="redis">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://cononyc.gitee.io/static/redis%E9%87%8D%E5%90%AF%E5%8A%A0%E8%BD%BD%E6%B5%81%E7%A8%8B%E5%9B%BE.png">
+<meta name="twitter:image" content="https://casecy.github.io/static/redis%E9%87%8D%E5%90%AF%E5%8A%A0%E8%BD%BD%E6%B5%81%E7%A8%8B%E5%9B%BE.png">
 
-<link rel="canonical" href="https://cononyc.gitee.io/2020/01/15/redis%E6%8C%81%E4%B9%85%E5%8C%96%E5%92%8C%E5%93%A8%E5%85%B5/">
+<link rel="canonical" href="https://casecy.github.io/2020/01/15/redis%E6%8C%81%E4%B9%85%E5%8C%96%E5%92%8C%E5%93%A8%E5%85%B5/">
 
 
 <script id="page-configurations">
@@ -184,7 +184,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://cononyc.gitee.io/2020/01/15/redis%E6%8C%81%E4%B9%85%E5%8C%96%E5%92%8C%E5%93%A8%E5%85%B5/">
+    <link itemprop="mainEntityOfPage" href="https://casecy.github.io/2020/01/15/redis%E6%8C%81%E4%B9%85%E5%8C%96%E5%92%8C%E5%93%A8%E5%85%B5/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
